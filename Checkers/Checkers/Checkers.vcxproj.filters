@@ -36,6 +36,9 @@
     <ClCompile Include="Source\filereader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Render2DObj.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\filereader.h">
@@ -65,5 +68,22 @@
     <ClInclude Include="Source\Simulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Render2DObj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\CubeFrag.txt">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="Source\CubeVert.txt">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="Source\TerrainFrag.txt">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="Source\TerrainVert.txt">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

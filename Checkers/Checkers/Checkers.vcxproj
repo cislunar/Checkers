@@ -81,6 +81,7 @@
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Obj3D.cpp" />
     <ClCompile Include="Source\Render.cpp" />
+    <ClCompile Include="Source\Render2DObj.cpp" />
     <ClCompile Include="Source\RenderObj.cpp" />
     <ClCompile Include="Source\RenderObjTest.cpp" />
     <ClCompile Include="Source\Simulation.cpp" />
@@ -91,10 +92,17 @@
     <ClInclude Include="Source\Math.h" />
     <ClInclude Include="Source\Obj3D.h" />
     <ClInclude Include="Source\Render.h" />
+    <ClInclude Include="Source\Render2DObj.h" />
     <ClInclude Include="Source\RenderObj.h" />
     <ClInclude Include="Source\RenderObjBase.h" />
     <ClInclude Include="Source\RenderObjTest.h" />
     <ClInclude Include="Source\Simulation.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\CubeFrag.txt" />
+    <None Include="Source\CubeVert.txt" />
+    <None Include="Source\TerrainFrag.txt" />
+    <None Include="Source\TerrainVert.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
