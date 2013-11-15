@@ -77,6 +77,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Board.cpp" />
+    <ClCompile Include="Source\Checker.cpp" />
     <ClCompile Include="Source\filereader.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Obj3D.cpp" />
@@ -87,6 +89,8 @@
     <ClCompile Include="Source\Simulation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Board.h" />
+    <ClInclude Include="Source\Checker.h" />
     <ClInclude Include="Source\filereader.h" />
     <ClInclude Include="Source\Main.h" />
     <ClInclude Include="Source\Math.h" />
