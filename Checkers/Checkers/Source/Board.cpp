@@ -39,7 +39,7 @@ void Board::Setup( char* _imageFilePath, glm::vec2 _imageRes, glm::vec2 _screenR
 	m_screenRes = _screenRes;
 
 	m_checkerPlain = LoadImage("checkerPlain.png");
-	m_checkerKing = m_image;// LoadImage("checkerKing");
+	m_checkerKing = LoadImage("checkerKing.png");
 
 	Checker obj;
 	glm::vec2 startPos = m_screenPos;
