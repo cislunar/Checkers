@@ -16,11 +16,13 @@ public:
 	virtual void		SetPos(glm::vec2 _pos){ m_screenPos = _pos; }
 	virtual glm::vec2	GetPos(){return m_screenPos;}
 	virtual glm::vec2*	GetImageRes(){return &m_imageRes;}
+	virtual void		SetRenderState(bool _state){m_canRender = _state;}
 
 protected:
 	GLuint		m_image;
 	glm::vec2	m_imageRes;
 	glm::vec2	m_screenPos;
 	Color		m_color;
+	bool		m_canRender;
 private:
 };

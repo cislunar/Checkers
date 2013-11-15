@@ -26,15 +26,18 @@ void Board::Cleanup()
 
 void Board::Render()
 {
-	// Draw board
-	DrawImage(m_image, Color(1,1,1,1), m_screenPos.x, m_screenPos.y, m_imageRes.x, m_imageRes.y);
-
-	// Draw checkers
-	for(int i=0; i<12; ++i)
+	if(m_canRender)
 	{
-		m_cellHighLights[i].Render_IgnoreBehind();
-		//m_redCheckers[i].Render();
-		//m_blackCheckers[i].Render();
+		// Draw board
+		DrawImage(m_image, Color(1,1,1,1), m_screenPos.x, m_screenPos.y, m_imageRes.x, m_imageRes.y);
+
+		// Draw checkers
+		for(int i=0; i<12; ++i)
+		{
+			m_cellHighLights[i].Render_IgnoreBehind();
+			m_redCheckers[i].Render();
+			m_blackCheckers[i].Render();
+		}
 	}
 }
 
@@ -74,6 +77,7 @@ void Board::Setup( char* _imageFilePath, glm::vec2 _imageRes, glm::vec2 _screenR
 		// Setup Highlights
 		highlight.Setup(m_cellHighlight, m_imageRes / 8.f, Color(1.f,.7f, 0,1));
 		highlight.SetPos( GetCellPos( -1 ) );
+		highlight.SetRenderState(false);
 		m_cellHighLights.push_back(highlight);
 	}
 }
@@ -83,6 +87,7 @@ glm::vec2 Board::GetCellPos( int c )
 	assert( c >= -1 && c < 64);
 	if( c == -1)
 	{
+		// give bogus position so that the object is off screen
 		return glm::vec2(-m_screenPos);
 	}
 	// Get beginning offset
