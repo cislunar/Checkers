@@ -9,7 +9,6 @@ public:
 	Checker() : Render2DObj( )
 	{
 	}
-	void		Render();
 	void		Cleanup();
 	glm::vec2*	GetPosPointer(){ return &m_screenPos; }
 protected:
