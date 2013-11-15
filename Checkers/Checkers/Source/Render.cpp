@@ -42,14 +42,40 @@ void Render::init_GL()
 	}
 }
 
+void	DrawImage( GLuint sourceTexture, Color& color, float xPos, float yPos, float width, float height, GLenum _sourceBlend, GLenum _destBlend )
+{
+	float halfW = width / 2.0f;
+	float halfH = height / 2.0f;
+	glColor4f(color.r, color.g, color.b, color.a);
+	glEnable( GL_TEXTURE_2D );
+	// Bind the texture to which subsequent calls refer to
+	glBindTexture( GL_TEXTURE_2D, sourceTexture );
+	glDisable ( GL_ALPHA_TEST ) ;
+	glBlendFunc(_sourceBlend,_destBlend);
+	glEnable ( GL_BLEND ) ;
+	glBegin( GL_QUADS );
+	// Top-left vertex (corner)
+	glTexCoord2i( 0, 0 );
+	glVertex3f( xPos-halfW, yPos-halfH, 0 );
+	// Bottom-left vertex (corner)
+	glTexCoord2i( 1, 0 );
+	glVertex3f( xPos+halfW, yPos-halfH, 0 );
+	// Bottom-right vertex (corner)
+	glTexCoord2i( 1, 1 );
+	glVertex3f( xPos+halfW, yPos+halfH, 0 );
+	// Top-right vertex (corner)
+	glTexCoord2i( 0, 1 );
+	glVertex3f( xPos-halfW, yPos+halfH, 0 );
+	glEnd();
+}
+
 void DrawImage( GLuint sourceTexture, Color& color, float xPos, float yPos, float width, float height )
 {
 	float halfW = width / 2.0f;
 	float halfH = height / 2.0f;
-	// Bind the texture to which subsequent calls refer to
-//	glColor3f(1.0f, 1.0f, 1.0f);
-	glColor3f(color.r, color.g, color.b);
+	glColor4f(color.r, color.g, color.b, color.a);
 	glEnable( GL_TEXTURE_2D );
+	// Bind the texture to which subsequent calls refer to
 	glBindTexture( GL_TEXTURE_2D, sourceTexture );
 	glDisable ( GL_ALPHA_TEST ) ;
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);

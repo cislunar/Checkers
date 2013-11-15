@@ -7,6 +7,7 @@ class Render2DObj
 public:
 	Render2DObj();
 	virtual void		Render();
+	virtual void		Render_IgnoreBehind();
 	virtual void		Setup( char* _imageFilePath, glm::vec2 _imageRes );
 	virtual void		Setup( GLuint _img, glm::vec2 _imageRes );
 	virtual void		Setup( char* _imageFilePath, glm::vec2 _imageRes, Color _color  );

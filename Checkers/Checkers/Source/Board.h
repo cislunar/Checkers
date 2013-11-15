@@ -17,10 +17,12 @@ public:
 	glm::vec2	GetCellPos( int c );
 protected:
 	glm::vec2 m_screenRes;
-	std::vector<Checker> m_redCheckers;
-	std::vector<Checker> m_blackCheckers;
-	GLuint m_checkerPlain;
-	GLuint m_checkerKing;
-	float m_checkerSize;
+	std::vector<Checker>		m_redCheckers;
+	std::vector<Checker>		m_blackCheckers;
+	std::vector<Render2DObj>	m_cellHighLights;
+	GLuint						m_checkerPlain;
+	GLuint						m_checkerKing;
+	GLuint						m_cellHighlight;
+	float						m_checkerSize;
 private:
 };

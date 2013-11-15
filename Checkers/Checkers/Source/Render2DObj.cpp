@@ -9,6 +9,11 @@ void Render2DObj::Render()
 	DrawImage(m_image, m_color, m_screenPos.x, m_screenPos.y, m_imageRes.x, m_imageRes.y);
 }
 
+void Render2DObj::Render_IgnoreBehind()
+{
+	DrawImage(m_image, m_color, m_screenPos.x, m_screenPos.y, m_imageRes.x, m_imageRes.y, GL_SRC_ALPHA, GL_ZERO);
+}
+
 void Render2DObj::Setup( char* _imageFilePath, glm::vec2 _imageRes )
 {
 	m_image = LoadImage( _imageFilePath );

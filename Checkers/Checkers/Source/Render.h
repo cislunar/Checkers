@@ -22,9 +22,9 @@ int printOglError(char *file, int line);
 
 struct Color
 {
-	Color() : r(1), g(1), b(1) {}
-	Color( float _r, float _g, float _b ) : r(_r), g(_g), b(_b) {}
-	float r, g, b;
+	Color() : r(1), g(1), b(1), a(1) {}
+	Color( float _r, float _g, float _b, float _a ) : r(_r), g(_g), b(_b), a(_a) {}
+	float r, g, b, a;
 };
 
 struct ShaderInfo
@@ -45,6 +45,7 @@ struct ShaderFiles
 };
 
 void	DrawImage( GLuint sourceTexture, Color& color, float xPos, float yPos, float width, float height );
+void	DrawImage( GLuint sourceTexture, Color& color, float xPos, float yPos, float width, float height, GLenum _sourceBlend, GLenum _destBlend );
 void	DrawImgRot( GLuint sourceTexture, Color& color, float xPos, float yPos, float width, float height, float rot );
 void	DrawLine( glm::vec2& start, glm::vec2& end, Color& color );
 GLuint	LoadImage( char* filename );
