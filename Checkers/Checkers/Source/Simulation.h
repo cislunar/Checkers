@@ -19,6 +19,7 @@ public:
 	void RotationWrap();					// Wrap rotation of sprites
 	glm::mat4 GetViewMat();
 	glm::mat4 GetProjMat();
+	glm::vec2 GetMousePos();
 
 
 private:
@@ -28,4 +29,6 @@ private:
 	static const int	MAX_SPRITES = 2;
 	GLuint				sprites[MAX_SPRITES];
 	glm::vec2			m_terrainRes;
+	glm::vec2			m_curMouse;
+	glm::vec2			m_prevMouse;
 };
