@@ -55,7 +55,6 @@ void Board::SetupHighlights( int _selectedCell )
 
 }
 
-
 void Board::Render()
 {
 	if(m_canRender)
@@ -74,6 +73,37 @@ void Board::Render()
 			m_blackCheckers[i].Render();
 		}
 	}
+}
+
+bool Board::CheckerOnCell( int _cell, CheckerType _type )
+{
+	if( _cell >= 0 && _cell < 8 * 8)
+	{
+		int cell = -1;
+		std::vector<Checker>* checkerVec = NULL;
+		switch( _type )
+		{
+		case BLACK_CHECKER:
+			checkerVec = &m_blackCheckers;
+			break;
+		case RED_CHECKER:
+			checkerVec = &m_redCheckers;
+			break;
+		default:
+		case CHECKER_TYPE_CNT:
+				break;
+		}
+
+		for(int i=0; i<12; ++i)
+		{
+			cell = GetCell( (*checkerVec)[i].GetPos() );
+			if( cell != -1 && cell == _cell)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 bool Board::CheckerOnCell( int _cell )

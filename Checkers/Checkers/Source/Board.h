@@ -13,6 +13,12 @@ struct Rect
 
 class Board : public Render2DObj
 {
+	enum CheckerType
+	{
+		BLACK_CHECKER,
+		RED_CHECKER,
+		CHECKER_TYPE_CNT
+	};
 public:
 	Board() : Render2DObj( )
 	{
@@ -20,12 +26,8 @@ public:
 	void		Render();
 	void		Setup( char* _imageFilePath, glm::vec2 _imageRes, glm::vec2 _screenRes );
 	void		Cleanup();
-	glm::vec2	GetCellPos( int c );
 	void		Update(float _dt );
-	int			GetCell( glm::vec2 _screenPos);
 	void		SetPos(glm::vec2 _pos);
-	bool		CheckerOnCell( int _cell );
-	void		SetupHighlights( int _selectedCell );
 
 protected:
 	glm::vec2 m_screenRes;
@@ -39,5 +41,12 @@ protected:
 	GLuint						m_cellHighlight;
 	float						m_cellSize;
 	Rect						m_boardRect;
+
+	void		SetupHighlights( int _selectedCell );
+	bool		CheckerOnCell( int _cell );
+	bool		CheckerOnCell( int _cell, CheckerType _type );
+	int			GetCell( glm::vec2 _screenPos);
+	glm::vec2	GetCellPos( int c );
+
 private:
 };
