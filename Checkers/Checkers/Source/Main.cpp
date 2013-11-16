@@ -98,6 +98,7 @@ int main(int argc, char *argv[])
 				break;
 
 			case SDL_KEYDOWN:
+				pSimulation->UpdateKeys(event.key.keysym.sym, true);
 				switch( event.key.keysym.sym )
 				{
 				case SDLK_1:
@@ -111,6 +112,7 @@ int main(int argc, char *argv[])
 				}
 				break;
 			case SDL_KEYUP:
+				pSimulation->UpdateKeys(event.key.keysym.sym, false);
 				switch( event.key.keysym.sym )
 				{
 				case SDLK_RIGHT:

@@ -11,6 +11,13 @@ void Board::Update(float _dt )
 	{
 		m_mouseHighlight.SetPos( GetCellPos(  mouseCellPos) );
 		m_mouseHighlight.SetRenderState(true);
+
+		if( mouseCellPos != m_selectedCell
+			&& m_sim->GetOnMouseButtonDown( SDL_BUTTON_LEFT ) )
+		{
+			m_selectedCell = mouseCellPos;
+			SetupHighlights( mouseCellPos );
+		}
 	}
 	else
 	{
@@ -40,6 +47,14 @@ void Board::Cleanup()
 		glDeleteTextures(1, &m_cellHighlight);
 	}
 }
+
+void Board::SetupHighlights( int _selectedCell )
+{
+	m_cellHighLights[0].SetPos( GetCellPos( _selectedCell ) );
+	m_cellHighLights[0].SetRenderState( true );
+
+}
+
 
 void Board::Render()
 {

@@ -25,12 +25,14 @@ public:
 	int			GetCell( glm::vec2 _screenPos);
 	void		SetPos(glm::vec2 _pos);
 	bool		CheckerOnCell( int _cell );
+	void		SetupHighlights( int _selectedCell );
 
 protected:
 	glm::vec2 m_screenRes;
 	std::vector<Checker>		m_redCheckers;
 	std::vector<Checker>		m_blackCheckers;
 	std::vector<Render2DObj>	m_cellHighLights;
+	int							m_selectedCell;
 	Render2DObj					m_mouseHighlight;
 	GLuint						m_checkerPlain;
 	GLuint						m_checkerKing;
