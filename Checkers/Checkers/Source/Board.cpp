@@ -24,7 +24,13 @@ void Board::HandleCellSelection(int _mousePosCell )
 				m_selectedCell = _mousePosCell;			
 				m_curPossibleMoves.clear();
 				Checker* c = GetCheckerOnCell( m_selectedCell );
-				GetCheckerMoves(c, m_selectedCell, NULL, &m_curPossibleMoves);
+
+				LegalMove startMove;
+				startMove.m_movedToCell = m_selectedCell;
+				startMove.m_moveType = LegalMove::START_MOVE;
+				m_curPossibleMoves.push_back(startMove);
+
+				GetCheckerMoves(c, m_selectedCell, &m_curPossibleMoves[0], &m_curPossibleMoves);
 				SetupHighlights( _mousePosCell, &m_curPossibleMoves );
 			}
 			else
@@ -44,14 +50,50 @@ void Board::HandleCellSelection(int _mousePosCell )
 			{
 				// Move checker
 				Checker* selected = GetCheckerOnCell( m_selectedCell );
+				LegalMove* finalMove = GetFinalMove( _mousePosCell );
 				selected->Move( GetCellPos( _mousePosCell) );
 				ResetHighlights();
 				m_curPossibleMoves.clear();
 			}
-			
 		}
 		m_mouseHighlight.SetRenderState(false);
 	}
+}
+
+void Board::UpdateAfterMove( LegalMove* finalMove, Checker* _c )
+{
+	std::vector<Checker>* checkerVec = NULL;
+	if( _c->GetCheckerType() == Checker::RED_CHECKER)
+	{
+		checkerVec = &m_blackCheckers;
+	}
+	else
+	{
+		checkerVec = &m_redCheckers;
+	}
+
+	if( finalMove->m_moveType != LegalMove::REG_MOVE)
+	{
+		LegalMove* move = finalMove;
+		while( move->m_prevMove != NULL)
+		{
+			//TODO calculate which checkers get removed
+		}
+	}
+}
+
+LegalMove* Board::GetFinalMove( int _cell )
+{
+	LegalMove* retval = NULL;
+	for(int i=0; i<(int)m_curPossibleMoves.size(); ++i)
+	{
+		if(m_curPossibleMoves[i].m_movedToCell == _cell)
+		{
+			retval = &m_curPossibleMoves[i];
+			break;
+		}
+	}
+	return retval;
 }
 
 bool Board::CellIsMoveable( int _cellNum )
@@ -104,13 +146,27 @@ void Board::ResetHighlights()
 	}
 }
 
+std::vector<LegalMove> Board::GetVisibleMoves( std::vector<LegalMove>* _finalMoves )
+{
+	std::vector<LegalMove> retval;
+	for(int i =0; i<(int)_finalMoves->size(); ++i)
+	{
+		if((*_finalMoves)[i].m_nextMove == NULL)
+		{
+			retval.push_back( (*_finalMoves)[i] );
+		}
+	}
+	return retval;
+}
+
 void Board::SetupHighlights( int _selectedCell, std::vector<LegalMove>* _possibleMoves )
 {
 	ResetHighlights();
 	m_cellHighLights[0].SetPos( GetCellPos( _selectedCell ) );
 	m_cellHighLights[0].SetRenderState( true );
 
-	for(uint32_t i=0; i<_possibleMoves->size(); ++i)
+	std::vector<LegalMove> visibleMoves = GetVisibleMoves( _possibleMoves );
+	for(uint32_t i=0; i<(int)visibleMoves.size(); ++i)
 	{
 		m_cellHighLights[i+1].SetPos( GetCellPos( (*_possibleMoves)[i].m_movedToCell ) );
 		m_cellHighLights[i+1].SetRenderState( true );
@@ -392,7 +448,7 @@ void Board::AddPossibleMove( std::vector<LegalMove>* _retMoves, LegalMove* _poss
 {
 	// Check if any moves in _retMoves is a parent to this possible move.
 	// If yes, remove it.
-	for(uint32_t i=0; i < _retMoves->size(); ++i)
+	/*for(uint32_t i=0; i < _retMoves->size(); ++i)
 	{
 		if( _possibleMove != NULL
 			&& _possibleMove->m_prevMove != NULL
@@ -401,11 +457,11 @@ void Board::AddPossibleMove( std::vector<LegalMove>* _retMoves, LegalMove* _poss
 			_retMoves->erase( _retMoves->begin() + i );
 			break;
 		}
-	}
+	}*/
 
 	if( _possibleMove->m_moveType == LegalMove::REG_MOVE )
 	{
-		// If this move is a regular jump, only add it if the list does not contain a jump
+		// If this move is a regular move, only add it if the list does not contain a jump
 		bool hasJump = false;
 		for(uint32_t i=0; i < _retMoves->size(); ++i)
 		{
@@ -423,7 +479,7 @@ void Board::AddPossibleMove( std::vector<LegalMove>* _retMoves, LegalMove* _poss
 	else
 	{
 		// If this move is a jump, delete any moves that are not jumps
-		for(int i=0; i<_retMoves->size(); ++i)
+		for(int i=0; i<(int)_retMoves->size(); ++i)
 		{
 			if((*_retMoves)[i].m_moveType == LegalMove::REG_MOVE)
 			{
@@ -431,6 +487,7 @@ void Board::AddPossibleMove( std::vector<LegalMove>* _retMoves, LegalMove* _poss
 				--i;
 			}
 		}
+		_possibleMove->m_prevMove = _possibleMove;
 		_retMoves->push_back( (*_possibleMove) );
 	}
 }

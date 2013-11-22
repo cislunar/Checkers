@@ -18,6 +18,7 @@ public:
 	{
 		JUMP_MOVE,
 		REG_MOVE,
+		START_MOVE,
 		MOVE_TYPE_COUNT
 	};
 	LegalMove()
@@ -25,17 +26,23 @@ public:
 		m_movedToCell = -1;
 		m_moveType = REG_MOVE;
 		m_prevMove = NULL;
+		m_nextMove = NULL;
 	};
 	LegalMove( LegalMove* _prevMove)
 	{
 		m_movedToCell = -1;
 		m_moveType = REG_MOVE;
 		m_prevMove = _prevMove;
+		if(m_prevMove)
+		{
+			m_prevMove->m_nextMove = this;
+		}
 	};
 
 	int m_movedToCell;
 	MOVE_TYPE m_moveType;
 	LegalMove* m_prevMove;
+	LegalMove* m_nextMove;
 };
 
 class Board : public Render2DObj
@@ -78,6 +85,9 @@ protected:
 	bool						MoveIsUnique( LegalMove* _prevMove, int _desiredCell );
 	bool						CellIsMoveable( int _cellNum );
 	void						AddPossibleMove( std::vector<LegalMove>* _retMoves, LegalMove* _possibleMove );
+	LegalMove*					GetFinalMove( int _cell );
+	void						UpdateAfterMove( LegalMove* finalMove,  Checker* _c );
+	std::vector<LegalMove>		GetVisibleMoves( std::vector<LegalMove>* _finalMoves );
 
 
 private:
