@@ -51,6 +51,7 @@ void Board::HandleCellSelection(int _mousePosCell )
 				// Move checker
 				Checker* selected = GetCheckerOnCell( m_selectedCell );
 				LegalMove* finalMove = GetFinalMove( _mousePosCell );
+				UpdateAfterMove( finalMove );
 				selected->Move( GetCellPos( _mousePosCell) );
 				ResetHighlights();
 				m_curPossibleMoves.clear();
@@ -60,24 +61,41 @@ void Board::HandleCellSelection(int _mousePosCell )
 	}
 }
 
-void Board::UpdateAfterMove( LegalMove* finalMove, Checker* _c )
+void Board::RemoveAffectedChecker( int _beginCell, int _endCell)
 {
-	std::vector<Checker>* checkerVec = NULL;
-	if( _c->GetCheckerType() == Checker::RED_CHECKER)
+	int maxCell = max(_beginCell, _endCell);
+	int minCell = min(_beginCell, _endCell);
+	int cellDiff = maxCell - minCell;
+	// Diff between cells will be:
+	// 14 (bot left)
+	// 18 (bot right)
+	int affectedCell = -1;
+	switch( cellDiff )
 	{
-		checkerVec = &m_blackCheckers;
-	}
-	else
-	{
-		checkerVec = &m_redCheckers;
+	case 14:
+		affectedCell = 7;
+		break;
+	case 18:
+		affectedCell = 9;
+		break;
+	default:
+		// We should never ever have this happen.
+		assert(false);
 	}
 
+	Checker* affected = GetCheckerOnCell(affectedCell);
+	affected->SetPos( GetCellPos(-1));
+}
+
+void Board::UpdateAfterMove( LegalMove* finalMove )
+{
 	if( finalMove->m_moveType != LegalMove::REG_MOVE)
 	{
 		LegalMove* move = finalMove;
 		while( move->m_prevMove != NULL)
 		{
-			//TODO calculate which checkers get removed
+			RemoveAffectedChecker(move->m_movedToCell, move->m_prevMove->m_movedToCell  );
+			move = move->m_prevMove;
 		}
 	}
 }

@@ -86,8 +86,9 @@ protected:
 	bool						CellIsMoveable( int _cellNum );
 	void						AddPossibleMove( std::vector<LegalMove>* _retMoves, LegalMove* _possibleMove );
 	LegalMove*					GetFinalMove( int _cell );
-	void						UpdateAfterMove( LegalMove* finalMove,  Checker* _c );
+	void						UpdateAfterMove( LegalMove* finalMove );
 	std::vector<LegalMove>		GetVisibleMoves( std::vector<LegalMove>* _finalMoves );
+	void						RemoveAffectedChecker( int _beginCell, int _endCell);
 
 
 private:
