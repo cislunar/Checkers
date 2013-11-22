@@ -13,12 +13,6 @@ struct Rect
 
 class Board : public Render2DObj
 {
-	enum CheckerType
-	{
-		BLACK_CHECKER,
-		RED_CHECKER,
-		CHECKER_TYPE_CNT
-	};
 public:
 	Board() : Render2DObj( )
 	{
@@ -30,7 +24,7 @@ public:
 	void		SetPos(glm::vec2 _pos);
 
 protected:
-	glm::vec2 m_screenRes;
+	glm::vec2					m_screenRes;
 	std::vector<Checker>		m_redCheckers;
 	std::vector<Checker>		m_blackCheckers;
 	std::vector<Render2DObj>	m_cellHighLights;
@@ -42,11 +36,18 @@ protected:
 	float						m_cellSize;
 	Rect						m_boardRect;
 
-	void		SetupHighlights( int _selectedCell );
-	bool		CheckerOnCell( int _cell );
-	bool		CheckerOnCell( int _cell, CheckerType _type );
-	int			GetCell( glm::vec2 _screenPos);
-	glm::vec2	GetCellPos( int c );
+	void						SetupHighlights( int _selectedCell, std::vector<int>* _possibleMoves  );
+	bool						CheckerOnCell( int _cell );
+	bool						CheckerOnCell( int _cell, Checker::CHECKER_TYPE _type );
+	Checker*					GetCheckerOnCell( int _cell );
+	int							GetCell( glm::vec2 _screenPos);
+	glm::vec2					GetCellPos( int c );
+	std::vector<int>			GetCheckerMoves( Checker* _c, int _cCell );
+	void						GetPossibleMoves( Checker* _c, int _cCell, int* _possibleMoves );
+	int							GetMoveCell( Checker* _movingChecker, glm::vec2 moveDir, int _startCellNum, int desiredCellNum );
+	void						HandleCellSelection(int _mousePosCell );
+	void						ResetHighlights();
+
 
 private:
 };

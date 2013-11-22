@@ -7,3 +7,16 @@ void Checker::Cleanup()
 		glDeleteTextures(1, &m_image);
 	}
 }
+
+void Checker::Init( CHECKER_TYPE _type )
+{
+	m_type = _type;
+	if(m_type == BLACK_CHECKER)
+	{
+		m_moveDir = MOVE_UP;
+	}
+	else
+	{
+		m_moveDir = MOVE_DOWN;
+	}
+}
