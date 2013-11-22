@@ -24,7 +24,7 @@ void Board::HandleCellSelection(int _mousePosCell )
 				m_selectedCell = _mousePosCell;			
 				m_curPossibleMoves.clear();
 				Checker* c = GetCheckerOnCell( m_selectedCell );
-				m_curPossibleMoves = GetCheckerMoves(c, m_selectedCell, NULL);
+				GetCheckerMoves(c, m_selectedCell, NULL, &m_curPossibleMoves);
 				SetupHighlights( _mousePosCell, &m_curPossibleMoves );
 			}
 			else
@@ -61,7 +61,7 @@ bool Board::CellIsMoveable( int _cellNum )
 	{
 		for(uint32_t i=0; i< m_curPossibleMoves.size(); ++i)
 		{
-			if(m_curPossibleMoves[i] == _cellNum)
+			if(m_curPossibleMoves[i].m_movedToCell == _cellNum)
 			{
 				retval = true;
 				break;
@@ -104,7 +104,7 @@ void Board::ResetHighlights()
 	}
 }
 
-void Board::SetupHighlights( int _selectedCell, std::vector<int>* _possibleMoves )
+void Board::SetupHighlights( int _selectedCell, std::vector<LegalMove>* _possibleMoves )
 {
 	ResetHighlights();
 	m_cellHighLights[0].SetPos( GetCellPos( _selectedCell ) );
@@ -112,7 +112,7 @@ void Board::SetupHighlights( int _selectedCell, std::vector<int>* _possibleMoves
 
 	for(uint32_t i=0; i<_possibleMoves->size(); ++i)
 	{
-		m_cellHighLights[i+1].SetPos( GetCellPos( (*_possibleMoves)[i] ) );
+		m_cellHighLights[i+1].SetPos( GetCellPos( (*_possibleMoves)[i].m_movedToCell ) );
 		m_cellHighLights[i+1].SetRenderState( true );
 	}
 }
@@ -388,10 +388,55 @@ void Board::GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves
 	}
 }
 
-
-std::vector<int> Board::GetCheckerMoves( Checker* _c, int _cCell, LegalMove* _prevMove)
+void Board::AddPossibleMove( std::vector<LegalMove>* _retMoves, LegalMove* _possibleMove )
 {
-	std::vector<int> retMoves;
+	// Check if any moves in _retMoves is a parent to this possible move.
+	// If yes, remove it.
+	for(uint32_t i=0; i < _retMoves->size(); ++i)
+	{
+		if( _possibleMove != NULL
+			&& _possibleMove->m_prevMove != NULL
+			&& (*_retMoves)[i].m_movedToCell == _possibleMove->m_prevMove->m_movedToCell )
+		{
+			_retMoves->erase( _retMoves->begin() + i );
+			break;
+		}
+	}
+
+	if( _possibleMove->m_moveType == LegalMove::REG_MOVE )
+	{
+		// If this move is a regular jump, only add it if the list does not contain a jump
+		bool hasJump = false;
+		for(uint32_t i=0; i < _retMoves->size(); ++i)
+		{
+			if((*_retMoves)[i].m_moveType == LegalMove::JUMP_MOVE)
+			{
+				hasJump = true;
+				break;
+			}
+		}
+		if(hasJump == false)
+		{
+			_retMoves->push_back( (*_possibleMove) );
+		}
+	}
+	else
+	{
+		// If this move is a jump, delete any moves that are not jumps
+		for(int i=0; i<_retMoves->size(); ++i)
+		{
+			if((*_retMoves)[i].m_moveType == LegalMove::REG_MOVE)
+			{
+				_retMoves->erase( _retMoves->begin() + i );
+				--i;
+			}
+		}
+		_retMoves->push_back( (*_possibleMove) );
+	}
+}
+
+void Board::GetCheckerMoves( Checker* _c, int _cCell, LegalMove* _prevMove, std::vector<LegalMove>* _legalMoves )
+{
 	LegalMove* possibleMoves = new LegalMove[4];
 	GetPossibleMoves( _c, _cCell, possibleMoves, _prevMove);
 
@@ -399,15 +444,13 @@ std::vector<int> Board::GetCheckerMoves( Checker* _c, int _cCell, LegalMove* _pr
 	{
 		if(possibleMoves[i].m_movedToCell != -1)
 		{
-			retMoves.push_back( possibleMoves[i].m_movedToCell );
+			AddPossibleMove(_legalMoves, &possibleMoves[i] );
 			if( possibleMoves[i].m_moveType == LegalMove::JUMP_MOVE )
 			{
-				std::vector<int> newMoves = GetCheckerMoves( _c, possibleMoves[i].m_movedToCell, &possibleMoves[i]);
-				retMoves.insert( retMoves.end(), newMoves.begin(), newMoves.end() );
+				GetCheckerMoves( _c, possibleMoves[i].m_movedToCell, &possibleMoves[i], _legalMoves);
 			}
 		}
 	}
 	
 	delete [] possibleMoves;
-	return retMoves;
 }
