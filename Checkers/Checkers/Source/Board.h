@@ -11,6 +11,25 @@ struct Rect
 	glm::vec2 botRight;
 };
 
+class LegalMove
+{
+public:
+	enum MOVE_TYPE
+	{
+		JUMP_MOVE,
+		REG_MOVE,
+		MOVE_TYPE_COUNT
+	};
+	LegalMove()
+	{
+		m_movedToCell = -1;
+		m_moveType = REG_MOVE;
+	};
+
+	int m_movedToCell;
+	MOVE_TYPE m_moveType;
+};
+
 class Board : public Render2DObj
 {
 public:
@@ -43,8 +62,8 @@ protected:
 	int							GetCell( glm::vec2 _screenPos);
 	glm::vec2					GetCellPos( int c );
 	std::vector<int>			GetCheckerMoves( Checker* _c, int _cCell );
-	void						GetPossibleMoves( Checker* _c, int _cCell, int* _possibleMoves );
-	int							GetMoveCell( Checker* _movingChecker, glm::vec2 moveDir, int _startCellNum, int desiredCellNum );
+	void						GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves );
+	LegalMove					GetMove( Checker* _movingChecker, glm::vec2 moveDir, int _startCellNum, int desiredCellNum );
 	void						HandleCellSelection(int _mousePosCell );
 	void						ResetHighlights();
 

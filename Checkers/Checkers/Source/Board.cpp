@@ -242,32 +242,6 @@ glm::vec2 Board::GetCellPos( int c )
 	return retval;
 }
 
-int Board::GetMoveCell( Checker* _movingChecker, glm::vec2 moveDir, int _startCellNum, int desiredCellNum )
-{
-	int retVal = -1;
-	// We cannot land on a cell that is occupied
-	if(CheckerOnCell(desiredCellNum) )
-	{
-		// if the other checker is an opponent checker we can jump it
-		if(CheckerOnCell( desiredCellNum, _movingChecker->GetCheckerType()) == false)
-		{
-			// If we can jump over it
-			int jumpCell = GetCell( GetCellPos(_startCellNum) + glm::vec2(moveDir.x * 2, moveDir.y * 2));
-			if( jumpCell != -1
-				&& CheckerOnCell(jumpCell) == false)
-			{
-				retVal = jumpCell;
-			}
-		}
-	}
-	// We can land on this cell
-	else
-	{
-		retVal = desiredCellNum;
-	}
-	return retVal;
-}
-
 Checker* Board::GetCheckerOnCell( int _cell )
 {
 	Checker* retval = NULL;
@@ -290,10 +264,37 @@ Checker* Board::GetCheckerOnCell( int _cell )
 	return retval;
 }
 
-
-void Board::GetPossibleMoves( Checker* _c, int _cCell, int* _possibleMoves )
+LegalMove Board::GetMove( Checker* _movingChecker, glm::vec2 moveDir, int _startCellNum, int desiredCellNum )
 {
-	_possibleMoves[0] = _possibleMoves[1] = _possibleMoves[2] = _possibleMoves[3] = -1;
+	LegalMove retVal;
+	// We cannot land on a cell that is occupied
+	if(CheckerOnCell(desiredCellNum) )
+	{
+		// if the other checker is an opponent checker we can jump it
+		if(CheckerOnCell( desiredCellNum, _movingChecker->GetCheckerType()) == false)
+		{
+			// If we can jump over it
+			int jumpCell = GetCell( GetCellPos(_startCellNum) + glm::vec2(moveDir.x * 2, moveDir.y * 2));
+			if( jumpCell != -1
+				&& CheckerOnCell(jumpCell) == false)
+			{
+				retVal.m_movedToCell = jumpCell;
+				retVal.m_moveType = LegalMove::JUMP_MOVE;
+			}
+		}
+	}
+	// We can land on this cell
+	else
+	{
+		retVal.m_movedToCell = desiredCellNum;
+		retVal.m_moveType = LegalMove::REG_MOVE;
+	}
+	return retVal;
+}
+
+void Board::GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves )
+{
+	_possibleMoves[0] = _possibleMoves[1] = _possibleMoves[2] = _possibleMoves[3] = LegalMove();
 	glm::vec2 cellPos = GetCellPos( _cCell );
 
 	if(	_c->GetCheckerType() == Checker::MOVE_KING
@@ -301,12 +302,12 @@ void Board::GetPossibleMoves( Checker* _c, int _cCell, int* _possibleMoves )
 	{
 		// up left
 		int desiredCell = GetCell( cellPos + glm::vec2(-m_cellSize, -m_cellSize));
-		_possibleMoves[0] = GetMoveCell(_c, glm::vec2(-m_cellSize, -m_cellSize), _cCell, desiredCell);
+		_possibleMoves[0] = GetMove(_c, glm::vec2(-m_cellSize, -m_cellSize), _cCell, desiredCell);
 		
 		// up right
 		desiredCell = GetCell( cellPos + glm::vec2(m_cellSize, -m_cellSize));
 
-		_possibleMoves[1] = GetMoveCell(_c, glm::vec2(m_cellSize, -m_cellSize), _cCell, desiredCell);
+		_possibleMoves[1] = GetMove(_c, glm::vec2(m_cellSize, -m_cellSize), _cCell, desiredCell);
 	}
 
 	if( _c->GetCheckerType() == Checker::MOVE_KING
@@ -314,27 +315,31 @@ void Board::GetPossibleMoves( Checker* _c, int _cCell, int* _possibleMoves )
 	{
 		// down left
 		int desiredCell = GetCell( cellPos + glm::vec2(-m_cellSize, m_cellSize));
-		_possibleMoves[2] = GetMoveCell(_c, glm::vec2(-m_cellSize, m_cellSize), _cCell, desiredCell);
+		_possibleMoves[2] = GetMove(_c, glm::vec2(-m_cellSize, m_cellSize), _cCell, desiredCell);
 
 		// down right
 		desiredCell = GetCell( cellPos + glm::vec2(m_cellSize, m_cellSize));
-		_possibleMoves[3] = GetMoveCell(_c, glm::vec2(m_cellSize, m_cellSize), _cCell, desiredCell);
+		_possibleMoves[3] = GetMove(_c, glm::vec2(m_cellSize, m_cellSize), _cCell, desiredCell);
 	}
 }
+
 
 std::vector<int> Board::GetCheckerMoves( Checker* _c, int _cCell )
 {
 	std::vector<int> retMoves;
-	int* possibleMoves = new int[4];
+	LegalMove* possibleMoves = new LegalMove[4];
 	GetPossibleMoves( _c, _cCell, possibleMoves);
 
 	for(int i=0; i<4; ++i)
 	{
-		if(possibleMoves[i] != -1)
+		if(possibleMoves[i].m_movedToCell != -1)
 		{
-			retMoves.push_back( possibleMoves[i] );
-			std::vector<int> newMoves = GetCheckerMoves( _c, possibleMoves[i] );
-			retMoves.insert( retMoves.end(), newMoves.begin(), newMoves.end() );
+			retMoves.push_back( possibleMoves[i].m_movedToCell );
+			if( possibleMoves[i].m_moveType == LegalMove::JUMP_MOVE )
+			{
+				std::vector<int> newMoves = GetCheckerMoves( _c, possibleMoves[i].m_movedToCell );
+				retMoves.insert( retMoves.end(), newMoves.begin(), newMoves.end() );
+			}
 		}
 	}
 	
