@@ -20,3 +20,9 @@ void Checker::Init( CHECKER_TYPE _type )
 		m_moveDir = MOVE_DOWN;
 	}
 }
+
+void Checker::Move( glm::vec2 _newPos )
+{
+	m_screenPos = _newPos;
+}
+

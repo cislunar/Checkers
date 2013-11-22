@@ -24,10 +24,18 @@ public:
 	{
 		m_movedToCell = -1;
 		m_moveType = REG_MOVE;
+		m_prevMove = NULL;
+	};
+	LegalMove( LegalMove* _prevMove)
+	{
+		m_movedToCell = -1;
+		m_moveType = REG_MOVE;
+		m_prevMove = _prevMove;
 	};
 
 	int m_movedToCell;
 	MOVE_TYPE m_moveType;
+	LegalMove* m_prevMove;
 };
 
 class Board : public Render2DObj
@@ -54,6 +62,7 @@ protected:
 	GLuint						m_cellHighlight;
 	float						m_cellSize;
 	Rect						m_boardRect;
+	std::vector<int>			m_curPossibleMoves;
 
 	void						SetupHighlights( int _selectedCell, std::vector<int>* _possibleMoves  );
 	bool						CheckerOnCell( int _cell );
@@ -61,11 +70,13 @@ protected:
 	Checker*					GetCheckerOnCell( int _cell );
 	int							GetCell( glm::vec2 _screenPos);
 	glm::vec2					GetCellPos( int c );
-	std::vector<int>			GetCheckerMoves( Checker* _c, int _cCell );
-	void						GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves );
-	LegalMove					GetMove( Checker* _movingChecker, glm::vec2 moveDir, int _startCellNum, int desiredCellNum );
+	std::vector<int>			GetCheckerMoves( Checker* _c, int _cCell,  LegalMove* _prevMove );
+	void						GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves, LegalMove* _prevMove );
+	LegalMove					GetMove( Checker* _movingChecker, LegalMove* _prevMove, glm::vec2 moveDir, int _startCellNum, int desiredCellNum );
 	void						HandleCellSelection(int _mousePosCell );
 	void						ResetHighlights();
+	bool						MoveIsUnique( LegalMove* _prevMove, int _desiredCell );
+	bool						CellIsMoveable( int _cellNum );
 
 
 private:
