@@ -8,17 +8,21 @@ void Checker::Cleanup()
 	}
 }
 
+void Checker::MakeKing( GLuint _kingImg )
+{
+	m_isKinged = true;
+	m_image = _kingImg;
+}
+
+bool Checker::IsKinged()
+{
+	return m_isKinged;
+}
+
+
 void Checker::Init( CHECKER_TYPE _type )
 {
 	m_type = _type;
-	if(m_type == BLACK_CHECKER)
-	{
-		m_moveDir = MOVE_UP;
-	}
-	else
-	{
-		m_moveDir = MOVE_DOWN;
-	}
 }
 
 void Checker::Move( glm::vec2 _newPos )

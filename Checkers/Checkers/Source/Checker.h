@@ -7,13 +7,6 @@
 class Checker : public Render2DObj
 {
 public:
-	enum CHECKER_MOVE_DIR
-	{
-		MOVE_UP,
-		MOVE_DOWN,
-		MOVE_KING,
-		CHECKER_MOVE_DIR_COUNT
-	};
 	enum CHECKER_TYPE
 	{
 		BLACK_CHECKER,
@@ -22,15 +15,17 @@ public:
 	};
 	Checker() : Render2DObj( )
 	{
+		m_isKinged = false;
 	}
 	void				Cleanup();
 	glm::vec2*			GetPosPointer(){ return &m_screenPos; }
-	CHECKER_MOVE_DIR	GetMoveDir(){ return m_moveDir; }
 	CHECKER_TYPE		GetCheckerType(){ return m_type;}
 	void				Init( CHECKER_TYPE _type );
 	void				Move( glm::vec2 _newPos );
+	bool				IsKinged();
+	void				MakeKing( GLuint _kingImg );
 protected:
-	CHECKER_MOVE_DIR m_moveDir;
 	CHECKER_TYPE		m_type;
+	bool				m_isKinged;
 private:
 };

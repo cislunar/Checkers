@@ -18,15 +18,13 @@ void LegalMove::Reset()
 	{
 		if(m_nextMoves[i] )
 		{
+			// Do we need to reset before deleting?
 			if(m_nextMoves[i]->HasNextMove())
 			{
 				m_nextMoves[i]->Reset();
 			}
-			else
-			{
-				delete m_nextMoves[i];
-				m_nextMoves[i] = NULL;
-			}
+			delete m_nextMoves[i];
+			m_nextMoves[i] = NULL;
 		}
 	}
 	m_prevMove = NULL;

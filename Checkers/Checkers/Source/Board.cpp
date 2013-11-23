@@ -51,7 +51,7 @@ void Board::HandleCellSelection(int _mousePosCell )
 				// Move checker
 				Checker* selected = GetCheckerOnCell( m_selectedCell );
 				LegalMove* finalMove = m_movesRoot.GetMatchingMove( _mousePosCell );
-				UpdateAfterMove( finalMove );
+				UpdateAfterMove( finalMove, selected);
 				selected->Move( GetCellPos( _mousePosCell) );
 				ResetHighlights();
 				m_movesRoot.Reset();
@@ -87,9 +87,9 @@ void Board::RemoveAffectedChecker( int _beginCell, int _endCell)
 	affected->SetPos( GetCellPos(-1));
 }
 
-void Board::UpdateAfterMove( LegalMove* finalMove )
+void Board::UpdateAfterMove( LegalMove* finalMove, Checker* _c )
 {
-	if( finalMove->m_moveType != LegalMove::REG_MOVE)
+	if( finalMove->m_moveType == LegalMove::JUMP_MOVE )
 	{
 		LegalMove* move = finalMove;
 		while( move->m_prevMove != NULL)
@@ -97,6 +97,12 @@ void Board::UpdateAfterMove( LegalMove* finalMove )
 			RemoveAffectedChecker(move->m_movedToCell, move->m_prevMove->m_movedToCell  );
 			move = move->m_prevMove;
 		}
+	}
+
+	if( _c->IsKinged() == false
+		&& IsKingMove(finalMove->m_movedToCell) )
+	{
+		_c->MakeKing( m_checkerKing);
 	}
 }
 
@@ -351,6 +357,13 @@ Checker* Board::GetCheckerOnCell( int _cell )
 	return retval;
 }
 
+bool Board::IsKingMove( int _cell )
+{
+	bool retval = (_cell >= 0 && _cell <= 7)
+					|| (_cell >= 56 &&_cell <= 63);
+	return retval;
+}
+
 LegalMove Board::GetMove( Checker* _movingChecker, LegalMove* const _prevMove, glm::vec2 moveDir, int _startCellNum, int desiredCellNum )
 {
 	LegalMove retVal;
@@ -365,7 +378,8 @@ LegalMove Board::GetMove( Checker* _movingChecker, LegalMove* const _prevMove, g
 				// If we can jump over it
 				int jumpCell = GetCell( GetCellPos(_startCellNum) + glm::vec2(moveDir.x * 2, moveDir.y * 2));
 				if( jumpCell != -1
-					&& CheckerOnCell(jumpCell) == false)
+					&& CheckerOnCell(jumpCell) == false
+					&& m_movesRoot.MoveIsUnique(jumpCell ) )
 				{
 					retVal.m_prevMove = _prevMove;
 					retVal.m_movedToCell = jumpCell;
@@ -381,6 +395,7 @@ LegalMove Board::GetMove( Checker* _movingChecker, LegalMove* const _prevMove, g
 					|| _prevMove->m_moveType != LegalMove::JUMP_MOVE)
 		{
 			retVal.m_movedToCell = desiredCellNum;
+			if(IsKingMove( retVal.m_movedToCell ) )
 			retVal.m_moveType = LegalMove::REG_MOVE;
 		}
 	}
@@ -392,8 +407,8 @@ void Board::GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves
 	_possibleMoves[0] = _possibleMoves[1] = _possibleMoves[2] = _possibleMoves[3] = LegalMove();
 	glm::vec2 cellPos = GetCellPos( _cCell );
 
-	if(	_c->GetCheckerType() == Checker::MOVE_KING
-		|| _c->GetCheckerType() == Checker::MOVE_UP )
+	if(	_c->GetCheckerType() == Checker::BLACK_CHECKER
+		|| _c->IsKinged() )
 	{
 		// up left
 		int desiredCell = GetCell( cellPos + glm::vec2(-m_cellSize, -m_cellSize));
@@ -405,8 +420,8 @@ void Board::GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves
 		_possibleMoves[1] = GetMove(_c, _prevMove, glm::vec2(m_cellSize, -m_cellSize), _cCell, desiredCell);
 	}
 
-	if( _c->GetCheckerType() == Checker::MOVE_KING
-		|| _c->GetCheckerType() == Checker::MOVE_DOWN )
+	if( _c->GetCheckerType() == Checker::RED_CHECKER
+		|| _c->IsKinged() )
 	{
 		// down left
 		int desiredCell = GetCell( cellPos + glm::vec2(-m_cellSize, m_cellSize));

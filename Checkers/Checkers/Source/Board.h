@@ -54,8 +54,9 @@ protected:
 	void						HandleCellSelection(int _mousePosCell );
 	void						ResetHighlights();
 	bool						CanMoveToCell( int _cellNum );
-	void						UpdateAfterMove( LegalMove* finalMove );
+	void						UpdateAfterMove( LegalMove* finalMove, Checker* _c );
 	void						RemoveAffectedChecker( int _beginCell, int _endCell);
+	bool						IsKingMove( int _cell );
 
 
 private:
