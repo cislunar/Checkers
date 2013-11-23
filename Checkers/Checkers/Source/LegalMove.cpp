@@ -96,6 +96,7 @@ std::vector<LegalMove> LegalMove::GetVisibleMoves( bool _hasJumps )
 	{
 		// If the move list has jumps, we only add jumps to the move list
 		if(_hasJumps == false
+				&& m_moveType != START_MOVE
 			|| _hasJumps == true
 				&& m_moveType == JUMP_MOVE )
 		{
