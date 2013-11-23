@@ -25,7 +25,8 @@ void Board::HandleCellSelection(int _mousePosCell )
 				m_curPossibleMoves.clear();
 				Checker* c = GetCheckerOnCell( m_selectedCell );
 
-				LegalMove startMove;
+				LegalMove startMove( m_curPossibleMoves.begin(), m_curPossibleMoves.begin());
+				startMove.m_nextMove = startMove.m_prevMove = m_curPossibleMoves.begin();
 				startMove.m_movedToCell = m_selectedCell;
 				startMove.m_moveType = LegalMove::START_MOVE;
 				// This reservation of memory is required because otherwise
@@ -96,8 +97,8 @@ void Board::UpdateAfterMove( std::vector<LegalMove>::iterator finalMove )
 	{
 		std::vector<LegalMove>::iterator move = finalMove;
 
-		while( std::find(m_curPossibleMoves.begin(), m_curPossibleMoves.end(),  move->m_prevMove)  
-				!= m_curPossibleMoves.end() )
+		// We loop through the list until we get to the end
+		while( move->m_prevMove != m_curPossibleMoves.begin() )
 		{
 			RemoveAffectedChecker(move->m_movedToCell, move->m_prevMove->m_movedToCell  );
 			move = move->m_prevMove;
@@ -175,8 +176,9 @@ std::vector<LegalMove> Board::GetVisibleMoves( std::vector<LegalMove>* _finalMov
 	for(int i =0; i<(int)_finalMoves->size(); ++i)
 	{
 		std::vector<LegalMove>::iterator tempNext = (_finalMoves->begin() + i)->m_nextMove;
-		if(std::find(m_curPossibleMoves.begin(), m_curPossibleMoves.end(),  tempNext)  
-			== m_curPossibleMoves.end())
+		//LegalMove value = *tempNext;
+		//std::vector<LegalMove>::iterator found = std::find(_finalMoves->begin(), _finalMoves->end(),  value);
+		if( tempNext == _finalMoves->end())
 		{
 			retval.push_back( (*_finalMoves)[i] );
 		}
@@ -391,8 +393,7 @@ bool Board::MoveIsUnique( std::vector<LegalMove>::iterator _prevMove, int _desir
 {
 	bool retval = true;
 	std::vector<LegalMove>::iterator mov = _prevMove;
-	while( std::find(m_curPossibleMoves.begin(), m_curPossibleMoves.end(),  mov)  
-		!= m_curPossibleMoves.end())
+	for( ; mov != null_vector.begin();)
 	{
 		if(mov->m_movedToCell == _desiredCell)
 		{
@@ -406,7 +407,7 @@ bool Board::MoveIsUnique( std::vector<LegalMove>::iterator _prevMove, int _desir
 
 LegalMove Board::GetMove( Checker* _movingChecker, std::vector<LegalMove>::iterator _prevMove, glm::vec2 moveDir, int _startCellNum, int desiredCellNum )
 {
-	LegalMove retVal = LegalMove( _prevMove );
+	LegalMove retVal = LegalMove( _prevMove, null_vector.begin() );
 	if( MoveIsUnique(_prevMove, desiredCellNum) )
 	{
 		// We cannot land on a cell that is occupied
@@ -426,10 +427,11 @@ LegalMove Board::GetMove( Checker* _movingChecker, std::vector<LegalMove>::itera
 			}
 		}
 		// We can land on this cell
-		// If we haven't previously jumped.
+		// If we haven't previously jumped
+		// or if the previous move is NULL.
 		// Once a checker jumps, the only moves it can continue to make
 		// are jump moves.
-		else if ( std::find(m_curPossibleMoves.begin(), m_curPossibleMoves.end(),  _prevMove)  == m_curPossibleMoves.end()
+		else if ( _prevMove  == null_vector.begin()
 					|| _prevMove->m_moveType != LegalMove::JUMP_MOVE)
 		{
 			retVal.m_movedToCell = desiredCellNum;
@@ -441,7 +443,8 @@ LegalMove Board::GetMove( Checker* _movingChecker, std::vector<LegalMove>::itera
 
 void Board::GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves,  std::vector<LegalMove>::iterator _prevMove )
 {
-	_possibleMoves[0] = _possibleMoves[1] = _possibleMoves[2] = _possibleMoves[3] = LegalMove();
+	_possibleMoves[0] = _possibleMoves[1] = _possibleMoves[2] = _possibleMoves[3] = LegalMove( null_vector.begin(), null_vector.begin());
+
 	glm::vec2 cellPos = GetCellPos( _cCell );
 
 	if(	_c->GetCheckerType() == Checker::MOVE_KING
@@ -489,7 +492,6 @@ bool Board::TryAddMove( std::vector<LegalMove>* _retMoves, LegalMove* _possibleM
 		{
 			_retMoves->push_back( (*_possibleMove) );
 			std::vector<LegalMove>::iterator newMove = _retMoves->begin() + (_retMoves->size() - 1);
-			
 			newMove->m_prevMove->m_nextMove = newMove;
 			retval = true;
 		}
@@ -505,6 +507,7 @@ bool Board::TryAddMove( std::vector<LegalMove>* _retMoves, LegalMove* _possibleM
 				--i;
 			}
 		}
+		_possibleMove->m_nextMove = null_vector.begin();
 		_retMoves->push_back( (*_possibleMove) );
 		std::vector<LegalMove>::iterator newMove = _retMoves->begin() + (_retMoves->size() - 1);
 		newMove->m_prevMove->m_nextMove = newMove;
@@ -515,7 +518,8 @@ bool Board::TryAddMove( std::vector<LegalMove>* _retMoves, LegalMove* _possibleM
 
 void Board::GetCheckerMoves( Checker* _c, int _cCell, std::vector<LegalMove>::iterator _prevMove, std::vector<LegalMove>* _legalMoves )
 {
-	LegalMove* possibleMoves = new LegalMove[4];
+	LegalMove temp(null_vector.begin(), null_vector.begin());
+	LegalMove possibleMoves[4] = {temp,temp,temp,temp};
 	GetPossibleMoves( _c, _cCell, possibleMoves, _prevMove);
 
 	for(int i=0; i<4; ++i)
@@ -530,7 +534,5 @@ void Board::GetCheckerMoves( Checker* _c, int _cCell, std::vector<LegalMove>::it
 				GetCheckerMoves( _c, possibleMoves[i].m_movedToCell, newMove, _legalMoves);
 			}
 		}
-	}
-	
-	delete [] possibleMoves;
+	}	
 }

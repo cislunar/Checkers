@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>    // std::find
 #include <string>
+#include <optional/optional.hpp>
 
 struct Rect
 {
@@ -16,6 +17,9 @@ struct Rect
 class LegalMove
 {
 public:
+	friend inline bool operator== (const LegalMove &lm1, const LegalMove &lm2);
+	friend inline bool operator!= (const LegalMove &lm1, const LegalMove &lm2);
+	
 	enum MOVE_TYPE
 	{
 		JUMP_MOVE,
@@ -23,32 +27,24 @@ public:
 		START_MOVE,
 		MOVE_TYPE_COUNT
 	};
-	LegalMove()
-	{
-		m_movedToCell = -1;
-		m_moveType = REG_MOVE;
-		m_prevMove;
-		m_nextMove;
-	};
-	LegalMove( std::vector<LegalMove>::iterator _prevMove)
+	LegalMove( std::vector<LegalMove>::iterator _prevMove, std::vector<LegalMove>::iterator _nextMove )
 	{
 		m_movedToCell = -1;
 		m_moveType = REG_MOVE;
 		m_prevMove = _prevMove;
+		m_nextMove = _nextMove;
 	};
 
 	int m_movedToCell;
 	MOVE_TYPE m_moveType;
-	std::vector<LegalMove>::iterator m_prevMove;
+	optional<std::vector<LegalMove>::iterator> m_prevMove;
 	std::vector<LegalMove>::iterator m_nextMove;
 };
 
 inline bool operator== (const LegalMove &lm1, const LegalMove &lm2)
 {
 	return (lm1.m_movedToCell == lm2.m_movedToCell 
-		&& lm1.m_moveType == lm2.m_moveType 
-		&& lm1.m_nextMove == lm2.m_nextMove 
-		&& lm1.m_prevMove == lm2.m_prevMove );
+		&& lm1.m_moveType == lm2.m_moveType );
 }
 
 inline bool operator!= (const LegalMove &lm1, const LegalMove &lm2)
