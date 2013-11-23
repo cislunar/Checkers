@@ -80,6 +80,7 @@
     <ClCompile Include="Source\Board.cpp" />
     <ClCompile Include="Source\Checker.cpp" />
     <ClCompile Include="Source\filereader.cpp" />
+    <ClCompile Include="Source\LegalMove.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Obj3D.cpp" />
     <ClCompile Include="Source\Render.cpp" />
@@ -92,6 +93,7 @@
     <ClInclude Include="Source\Board.h" />
     <ClInclude Include="Source\Checker.h" />
     <ClInclude Include="Source\filereader.h" />
+    <ClInclude Include="Source\LegalMove.h" />
     <ClInclude Include="Source\Main.h" />
     <ClInclude Include="Source\Math.h" />
     <ClInclude Include="Source\Obj3D.h" />

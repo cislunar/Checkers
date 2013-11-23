@@ -22,21 +22,21 @@ void Board::HandleCellSelection(int _mousePosCell )
 			if( _mousePosCell != m_selectedCell )
 			{
 				m_selectedCell = _mousePosCell;			
-				m_curPossibleMoves.clear();
+				m_movesRoot.Reset();
 				Checker* c = GetCheckerOnCell( m_selectedCell );
 
 				LegalMove startMove;
 				startMove.m_movedToCell = m_selectedCell;
 				startMove.m_moveType = LegalMove::START_MOVE;
-				m_curPossibleMoves.push_back(startMove);
+				m_movesRoot = startMove;
 
-				GetCheckerMoves(c, m_selectedCell, &m_curPossibleMoves[0], &m_curPossibleMoves);
-				SetupHighlights( _mousePosCell, &m_curPossibleMoves );
+				GetCheckerMoves(c, m_selectedCell, &m_movesRoot );
+				SetupHighlights( _mousePosCell, &m_movesRoot );
 			}
 			else
 			{
 				m_selectedCell = -1;
-				m_curPossibleMoves.clear();
+				m_movesRoot.Reset();
 				ResetHighlights();
 			}
 		}
@@ -46,15 +46,15 @@ void Board::HandleCellSelection(int _mousePosCell )
 		if( _mousePosCell != m_selectedCell
 			&& m_sim->GetOnMouseButtonDown( SDL_BUTTON_LEFT ) )
 		{
-			if(CellIsMoveable( _mousePosCell ) )
+			if(CanMoveToCell( _mousePosCell ) )
 			{
 				// Move checker
 				Checker* selected = GetCheckerOnCell( m_selectedCell );
-				LegalMove* finalMove = GetFinalMove( _mousePosCell );
+				LegalMove* finalMove = m_movesRoot.GetMatchingMove( _mousePosCell );
 				UpdateAfterMove( finalMove );
 				selected->Move( GetCellPos( _mousePosCell) );
 				ResetHighlights();
-				m_curPossibleMoves.clear();
+				m_movesRoot.Reset();
 			}
 		}
 		m_mouseHighlight.SetRenderState(false);
@@ -73,10 +73,10 @@ void Board::RemoveAffectedChecker( int _beginCell, int _endCell)
 	switch( cellDiff )
 	{
 	case 14:
-		affectedCell = 7;
+		affectedCell = minCell + 7;
 		break;
 	case 18:
-		affectedCell = 9;
+		affectedCell = minCell + 9;
 		break;
 	default:
 		// We should never ever have this happen.
@@ -100,32 +100,17 @@ void Board::UpdateAfterMove( LegalMove* finalMove )
 	}
 }
 
-LegalMove* Board::GetFinalMove( int _cell )
-{
-	LegalMove* retval = NULL;
-	for(int i=0; i<(int)m_curPossibleMoves.size(); ++i)
-	{
-		if(m_curPossibleMoves[i].m_movedToCell == _cell)
-		{
-			retval = &m_curPossibleMoves[i];
-			break;
-		}
-	}
-	return retval;
-}
-
-bool Board::CellIsMoveable( int _cellNum )
+bool Board::CanMoveToCell( int _cellNum )
 {
 	bool retval = false;
-	if(m_curPossibleMoves.size() > 0)
+
+	std::vector<LegalMove>::iterator first;
+	for( first=m_visibleMoves.begin(); first != m_visibleMoves.end(); ++first)
 	{
-		for(uint32_t i=0; i< m_curPossibleMoves.size(); ++i)
+		if( first->m_movedToCell == _cellNum )
 		{
-			if(m_curPossibleMoves[i].m_movedToCell == _cellNum)
-			{
-				retval = true;
-				break;
-			}
+			retval = true;
+			break;
 		}
 	}
 	return retval;
@@ -164,29 +149,18 @@ void Board::ResetHighlights()
 	}
 }
 
-std::vector<LegalMove> Board::GetVisibleMoves( std::vector<LegalMove>* _finalMoves )
-{
-	std::vector<LegalMove> retval;
-	for(int i =0; i<(int)_finalMoves->size(); ++i)
-	{
-		if((*_finalMoves)[i].m_nextMove == NULL)
-		{
-			retval.push_back( (*_finalMoves)[i] );
-		}
-	}
-	return retval;
-}
-
-void Board::SetupHighlights( int _selectedCell, std::vector<LegalMove>* _possibleMoves )
+void Board::SetupHighlights( int _selectedCell, LegalMove* _rootMove  )
 {
 	ResetHighlights();
 	m_cellHighLights[0].SetPos( GetCellPos( _selectedCell ) );
 	m_cellHighLights[0].SetRenderState( true );
 
-	std::vector<LegalMove> visibleMoves = GetVisibleMoves( _possibleMoves );
-	for(uint32_t i=0; i<(int)visibleMoves.size(); ++i)
+	m_visibleMoves = _rootMove->GetVisibleMoves( _rootMove->ContainsJump() );
+	std::vector<LegalMove>::iterator iter;
+	int i=0;
+	for( iter=m_visibleMoves.begin(); iter != m_visibleMoves.end(); ++iter, ++i)
 	{
-		m_cellHighLights[i+1].SetPos( GetCellPos( (*_possibleMoves)[i].m_movedToCell ) );
+		m_cellHighLights[i+1].SetPos( GetCellPos( iter->m_movedToCell ) );
 		m_cellHighLights[i+1].SetRenderState( true );
 	}
 }
@@ -377,29 +351,10 @@ Checker* Board::GetCheckerOnCell( int _cell )
 	return retval;
 }
 
-// We can only make the move if it hasn't been done before on this 
-// turn. This function should only be called on potential
-// moves for a King piece as they can double back and change direction.
-bool Board::MoveIsUnique( LegalMove* _prevMove, int _desiredCell )
+LegalMove Board::GetMove( Checker* _movingChecker, LegalMove* const _prevMove, glm::vec2 moveDir, int _startCellNum, int desiredCellNum )
 {
-	bool retval = true;
-	LegalMove* mov = _prevMove;
-	while( mov != NULL)
-	{
-		if(mov->m_movedToCell == _desiredCell)
-		{
-			retval = false;
-			break;
-		}
-		mov = mov->m_prevMove;
-	}
-	return retval;
-}
-
-LegalMove Board::GetMove( Checker* _movingChecker, LegalMove* _prevMove, glm::vec2 moveDir, int _startCellNum, int desiredCellNum )
-{
-	LegalMove retVal = LegalMove( _prevMove );
-	if( MoveIsUnique(_prevMove, desiredCellNum) )
+	LegalMove retVal;
+	if( m_movesRoot.MoveIsUnique( desiredCellNum ) )
 	{
 		// We cannot land on a cell that is occupied
 		if(CheckerOnCell(desiredCellNum) )
@@ -412,6 +367,7 @@ LegalMove Board::GetMove( Checker* _movingChecker, LegalMove* _prevMove, glm::ve
 				if( jumpCell != -1
 					&& CheckerOnCell(jumpCell) == false)
 				{
+					retVal.m_prevMove = _prevMove;
 					retVal.m_movedToCell = jumpCell;
 					retVal.m_moveType = LegalMove::JUMP_MOVE;
 				}
@@ -431,7 +387,7 @@ LegalMove Board::GetMove( Checker* _movingChecker, LegalMove* _prevMove, glm::ve
 	return retVal;
 }
 
-void Board::GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves,  LegalMove* _prevMove )
+void Board::GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves,  LegalMove* const _prevMove )
 {
 	_possibleMoves[0] = _possibleMoves[1] = _possibleMoves[2] = _possibleMoves[3] = LegalMove();
 	glm::vec2 cellPos = GetCellPos( _cCell );
@@ -462,55 +418,7 @@ void Board::GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves
 	}
 }
 
-void Board::AddPossibleMove( std::vector<LegalMove>* _retMoves, LegalMove* _possibleMove )
-{
-	// Check if any moves in _retMoves is a parent to this possible move.
-	// If yes, remove it.
-	/*for(uint32_t i=0; i < _retMoves->size(); ++i)
-	{
-		if( _possibleMove != NULL
-			&& _possibleMove->m_prevMove != NULL
-			&& (*_retMoves)[i].m_movedToCell == _possibleMove->m_prevMove->m_movedToCell )
-		{
-			_retMoves->erase( _retMoves->begin() + i );
-			break;
-		}
-	}*/
-
-	if( _possibleMove->m_moveType == LegalMove::REG_MOVE )
-	{
-		// If this move is a regular move, only add it if the list does not contain a jump
-		bool hasJump = false;
-		for(uint32_t i=0; i < _retMoves->size(); ++i)
-		{
-			if((*_retMoves)[i].m_moveType == LegalMove::JUMP_MOVE)
-			{
-				hasJump = true;
-				break;
-			}
-		}
-		if(hasJump == false)
-		{
-			_retMoves->push_back( (*_possibleMove) );
-		}
-	}
-	else
-	{
-		// If this move is a jump, delete any moves that are not jumps
-		for(int i=0; i<(int)_retMoves->size(); ++i)
-		{
-			if((*_retMoves)[i].m_moveType == LegalMove::REG_MOVE)
-			{
-				_retMoves->erase( _retMoves->begin() + i );
-				--i;
-			}
-		}
-		_possibleMove->m_prevMove = _possibleMove;
-		_retMoves->push_back( (*_possibleMove) );
-	}
-}
-
-void Board::GetCheckerMoves( Checker* _c, int _cCell, LegalMove* _prevMove, std::vector<LegalMove>* _legalMoves )
+void Board::GetCheckerMoves( Checker* _c, int _cCell, LegalMove* _prevMove )
 {
 	LegalMove* possibleMoves = new LegalMove[4];
 	GetPossibleMoves( _c, _cCell, possibleMoves, _prevMove);
@@ -519,10 +427,10 @@ void Board::GetCheckerMoves( Checker* _c, int _cCell, LegalMove* _prevMove, std:
 	{
 		if(possibleMoves[i].m_movedToCell != -1)
 		{
-			AddPossibleMove(_legalMoves, &possibleMoves[i] );
+			LegalMove* newMove = _prevMove->AddNextMove( &possibleMoves[i] );
 			if( possibleMoves[i].m_moveType == LegalMove::JUMP_MOVE )
 			{
-				GetCheckerMoves( _c, possibleMoves[i].m_movedToCell, &possibleMoves[i], _legalMoves);
+				GetCheckerMoves( _c, newMove->m_movedToCell, newMove);
 			}
 		}
 	}

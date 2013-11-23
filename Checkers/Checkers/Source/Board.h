@@ -4,6 +4,8 @@
 #include "Render2DObj.h"
 #include "Checker.h"
 #include <vector>
+#include "LegalMove.h"
+#include <algorithm>
 
 struct Rect
 {
@@ -11,39 +13,7 @@ struct Rect
 	glm::vec2 botRight;
 };
 
-class LegalMove
-{
-public:
-	enum MOVE_TYPE
-	{
-		JUMP_MOVE,
-		REG_MOVE,
-		START_MOVE,
-		MOVE_TYPE_COUNT
-	};
-	LegalMove()
-	{
-		m_movedToCell = -1;
-		m_moveType = REG_MOVE;
-		m_prevMove = NULL;
-		m_nextMove = NULL;
-	};
-	LegalMove( LegalMove* _prevMove)
-	{
-		m_movedToCell = -1;
-		m_moveType = REG_MOVE;
-		m_prevMove = _prevMove;
-		if(m_prevMove)
-		{
-			m_prevMove->m_nextMove = this;
-		}
-	};
 
-	int m_movedToCell;
-	MOVE_TYPE m_moveType;
-	LegalMove* m_prevMove;
-	LegalMove* m_nextMove;
-};
 
 class Board : public Render2DObj
 {
@@ -69,25 +39,22 @@ protected:
 	GLuint						m_cellHighlight;
 	float						m_cellSize;
 	Rect						m_boardRect;
-	std::vector<LegalMove>		m_curPossibleMoves;
+	LegalMove					m_movesRoot;
+	std::vector<LegalMove>		m_visibleMoves;
 
-	void						SetupHighlights( int _selectedCell, std::vector<LegalMove>* _possibleMoves  );
+	void						SetupHighlights( int _selectedCell, LegalMove* _rootMove  );
 	bool						CheckerOnCell( int _cell );
 	bool						CheckerOnCell( int _cell, Checker::CHECKER_TYPE _type );
 	Checker*					GetCheckerOnCell( int _cell );
 	int							GetCell( glm::vec2 _screenPos);
 	glm::vec2					GetCellPos( int c );
-	void						GetCheckerMoves( Checker* _c, int _cCell,  LegalMove* _prevMove, std::vector<LegalMove>* _legalMoves  );
-	void						GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves, LegalMove* _prevMove );
-	LegalMove					GetMove( Checker* _movingChecker, LegalMove* _prevMove, glm::vec2 moveDir, int _startCellNum, int desiredCellNum );
+	void						GetCheckerMoves( Checker* _c, int _cCell,  LegalMove* _prevMove );
+	void						GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves, LegalMove* const _prevMove );
+	LegalMove					GetMove( Checker* _movingChecker, LegalMove* const _prevMove, glm::vec2 moveDir, int _startCellNum, int desiredCellNum );
 	void						HandleCellSelection(int _mousePosCell );
 	void						ResetHighlights();
-	bool						MoveIsUnique( LegalMove* _prevMove, int _desiredCell );
-	bool						CellIsMoveable( int _cellNum );
-	void						AddPossibleMove( std::vector<LegalMove>* _retMoves, LegalMove* _possibleMove );
-	LegalMove*					GetFinalMove( int _cell );
+	bool						CanMoveToCell( int _cellNum );
 	void						UpdateAfterMove( LegalMove* finalMove );
-	std::vector<LegalMove>		GetVisibleMoves( std::vector<LegalMove>* _finalMoves );
 	void						RemoveAffectedChecker( int _beginCell, int _endCell);
 
 
