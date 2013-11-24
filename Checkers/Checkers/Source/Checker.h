@@ -24,8 +24,11 @@ public:
 	void				Move( glm::vec2 _newPos );
 	bool				IsKinged();
 	void				MakeKing( GLuint _kingImg );
+	void				Deactivate( glm::vec2 _newPos );
+	bool				Active(){return m_isActive;}
 protected:
 	CHECKER_TYPE		m_type;
 	bool				m_isKinged;
+	bool				m_isActive;
 private:
 };

@@ -84,7 +84,7 @@ void Board::RemoveAffectedChecker( int _beginCell, int _endCell)
 	}
 
 	Checker* affected = GetCheckerOnCell(affectedCell);
-	affected->SetPos( GetCellPos(-1));
+	affected->Deactivate( GetCellPos(-1) );
 }
 
 void Board::UpdateAfterMove( LegalMove* finalMove, Checker* _c )
@@ -452,3 +452,33 @@ void Board::GetCheckerMoves( Checker* _c, int _cCell, LegalMove* _prevMove )
 	
 	delete [] possibleMoves;
 }
+
+bool Board::GameIsOver()
+{
+	return HasPiecesLeft( Checker::BLACK_CHECKER) == false || HasPiecesLeft(Checker::RED_CHECKER) == false;
+}
+
+
+bool Board::HasPiecesLeft( Checker::CHECKER_TYPE _ct )
+{
+	std::vector<Checker>* checkers;
+	if( _ct == Checker::BLACK_CHECKER)
+	{
+		checkers = &m_blackCheckers;
+	}
+	else
+	{
+		checkers = &m_redCheckers;
+	}
+	std::vector<Checker>::iterator it;
+	int count = 0;
+	for( it=checkers->begin(); it != checkers->end(); ++it)
+	{
+		if(it->Active())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+

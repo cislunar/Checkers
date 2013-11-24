@@ -26,6 +26,8 @@ public:
 	void		Cleanup();
 	void		Update(float _dt );
 	void		SetPos(glm::vec2 _pos);
+	bool		GameIsOver();
+	bool		HasPiecesLeft( Checker::CHECKER_TYPE _ct );
 
 protected:
 	glm::vec2					m_screenRes;
@@ -57,7 +59,6 @@ protected:
 	void						UpdateAfterMove( LegalMove* finalMove, Checker* _c );
 	void						RemoveAffectedChecker( int _beginCell, int _endCell);
 	bool						IsKingMove( int _cell );
-
 
 private:
 };

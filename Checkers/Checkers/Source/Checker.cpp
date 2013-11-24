@@ -23,6 +23,13 @@ bool Checker::IsKinged()
 void Checker::Init( CHECKER_TYPE _type )
 {
 	m_type = _type;
+	m_isActive = true;
+}
+
+void Checker::Deactivate( glm::vec2 _newPos )
+{
+	m_screenPos = _newPos;
+	m_isActive = false;
 }
 
 void Checker::Move( glm::vec2 _newPos )

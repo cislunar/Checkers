@@ -30,6 +30,7 @@ public:
 
 private:
 	Simulation();							// Force use of singleton
+	void				ShowGameOver();
 
 	static Simulation	singleton;
 	static const int	MAX_SPRITES = 2;
@@ -41,4 +42,9 @@ private:
 	bool				m_prevKEYS[322]; // Number of SDLK_DOWN events
 	unsigned char		m_prevMouseButts;
 	unsigned char		m_curMouseButts;
+	GLuint				m_redWins;
+	GLuint				m_blackWins;
+	GLuint*				m_winner;
+	bool				m_gameIsOver;
+	bool				m_canDrawGameOver;
 };
