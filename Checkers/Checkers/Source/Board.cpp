@@ -482,3 +482,7 @@ bool Board::HasPiecesLeft( Checker::CHECKER_TYPE _ct )
 	return false;
 }
 
+void Board::SetPlayerType( Checker::CHECKER_TYPE _type )
+{
+	m_playerType = _type;
+}

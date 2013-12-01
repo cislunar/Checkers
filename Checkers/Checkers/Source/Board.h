@@ -28,22 +28,28 @@ public:
 	void		SetPos(glm::vec2 _pos);
 	bool		GameIsOver();
 	bool		HasPiecesLeft( Checker::CHECKER_TYPE _ct );
+	void		SetPlayerType(Checker::CHECKER_TYPE _type);
 
-protected:
+private:
+	// Board information
 	glm::vec2					m_screenRes;
 	std::vector<Checker>		m_redCheckers;
 	std::vector<Checker>		m_blackCheckers;
 	std::vector<Render2DObj>	m_cellHighLights;
-	int							m_selectedCell;
 	Render2DObj					m_mouseHighlight;
-	GLuint						m_checkerPlain;
-	GLuint						m_checkerKing;
-	GLuint						m_cellHighlight;
+	// Textures
+	GLuint						m_checkerPlain,
+								m_checkerKing,
+								m_cellHighlight;
+	// Misc
 	float						m_cellSize;
 	Rect						m_boardRect;
 	LegalMove					m_movesRoot;
 	std::vector<LegalMove>		m_visibleMoves;
+	int							m_selectedCell;
+	Checker::CHECKER_TYPE		m_playerType;
 
+	// Functions
 	void						SetupHighlights( int _selectedCell, LegalMove* _rootMove  );
 	bool						CheckerOnCell( int _cell );
 	bool						CheckerOnCell( int _cell, Checker::CHECKER_TYPE _type );
@@ -60,5 +66,4 @@ protected:
 	void						RemoveAffectedChecker( int _beginCell, int _endCell);
 	bool						IsKingMove( int _cell );
 
-private:
 };
