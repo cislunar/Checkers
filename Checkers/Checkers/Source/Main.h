@@ -9,7 +9,7 @@
 #define SPRITE_RADIUS (SPRITE_DIAM/2)
 
 // Tweak menu
-#define TWEAK_MENU _DEBUG || 1	// Useful in release for tuning water behavior
+#define TWEAK_MENU 0//_DEBUG || 0	// Useful in release for tuning water behavior
 #if TWEAK_MENU
 #include "AntTweakBar.h"
 TwBar *TwkBar();

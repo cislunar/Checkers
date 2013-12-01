@@ -17,14 +17,13 @@ TwBar *TwkBar()
 
 SDL_Event event;
 float x=100,y=100;
+SDL_Surface *screen;
 
 
 void StartFrame()
 {
 	// Clear the screen before drawing
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//	glTranslatef(SCREEN_W/2,SCREEN_HEIGHT/2,0.0);	// Moves world origin to center of window
-//	glRotatef( spin, 0.0, 0.0, 1.0 );				// Rotate camera
 }
 
 void EndFrame()
@@ -35,14 +34,20 @@ void EndFrame()
 
 int init()
 {
-	SDL_Surface *screen;
 	// Slightly different SDL initialization
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ) {
 		printf("Unable to initialize SDL: %s\n", SDL_GetError());
 		return 1;
 	}
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-	screen = SDL_SetVideoMode( SCREEN_W, SCREEN_H, 0, SDL_OPENGL | SDL_OPENGL);//SDL_FULLSCREEN );	
+	int error = -1;
+	SDL_GL_GetAttribute( SDL_GL_DOUBLEBUFFER, &error );
+	if( error == -1)
+	{
+		printf("Error setting SDL_GL_DOUBLEBUFFER\n");
+		return 1;
+	}
+	screen = SDL_SetVideoMode( SCREEN_W, SCREEN_H, 0, SDL_OPENGL);//SDL_FULLSCREEN );	
 	if ( !screen ) {
 		printf("Unable to set video mode: %s\n", SDL_GetError());
 		return 1;

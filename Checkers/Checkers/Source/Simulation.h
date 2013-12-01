@@ -46,6 +46,13 @@ public:
 private:
 	Simulation();							// Force use of singleton
 	~Simulation();
+
+	// Statics and consts
+	static const int	DEFAULT_BUFLEN = 1024;
+	static const int	MAX_INPUT_LEN = 256;
+	static const int	MAX_SPRITES = 2;
+	static Simulation	singleton;
+
 	void				ShowGameOver();
 	void				SetupNetworkingState();
 	void				SetupGame();
@@ -76,15 +83,8 @@ private:
 	SOCKET				ConnectSocket;
 
 	int					iSendResult;
-	static const int	DEFAULT_BUFLEN = 1024;
 	char				sendbuf[DEFAULT_BUFLEN];
 	int					sendbuflen;
 	char				recvbuf[DEFAULT_BUFLEN];
 	int					recvbuflen;
-
-	// Statics and consts
-	static const int	MAX_INPUT_LEN = 256;
-	static const int	MAX_SPRITES = 2;
-	static Simulation	singleton;
-
 };
