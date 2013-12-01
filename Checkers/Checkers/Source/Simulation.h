@@ -8,6 +8,13 @@ void Log(const char *fmt, ...);
 
 class Simulation
 {
+	enum USER_TYPE
+	{
+		USER_CLIENT,
+		USER_SERVER,
+		USER_TYPE_COUNT
+	};
+
 public:
 	static Simulation* GetSimulation() {return &singleton;}
 
@@ -31,6 +38,10 @@ public:
 private:
 	Simulation();							// Force use of singleton
 	void				ShowGameOver();
+	void				SetupNetworkingState();
+	void				SetupGame();
+	void				EatExtraInput(void);
+	void				GetInput( char* _inputBuf, const int _maxMsgLen );
 
 	static Simulation	singleton;
 	static const int	MAX_SPRITES = 2;
@@ -47,4 +58,5 @@ private:
 	GLuint*				m_winner;
 	bool				m_gameIsOver;
 	bool				m_canDrawGameOver;
+	USER_TYPE			m_userType;
 };
