@@ -26,6 +26,7 @@ class Simulation
 public:
 	static Simulation* GetSimulation() {return &singleton;}
 
+
 	void Init();
 	void Shutdown();
 
@@ -44,6 +45,7 @@ public:
 
 private:
 	Simulation();							// Force use of singleton
+	~Simulation();
 	void				ShowGameOver();
 	void				SetupNetworkingState();
 	void				SetupGame();
@@ -71,11 +73,14 @@ private:
 	int					iResult;
 	SOCKET				ListenSocket;
 	SOCKET				ClientSocket;
+	SOCKET				ConnectSocket;
+
 	int					iSendResult;
-	//char				recvbuf[DEFAULT_BUFLEN];
-	//int					recvbuflen = DEFAULT_BUFLEN;
-	//char				sendbuf[DEFAULT_BUFLEN];
-	//int					sendbuflen = DEFAULT_BUFLEN;
+	static const int	DEFAULT_BUFLEN = 1024;
+	char				sendbuf[DEFAULT_BUFLEN];
+	int					sendbuflen;
+	char				recvbuf[DEFAULT_BUFLEN];
+	int					recvbuflen;
 
 	// Statics and consts
 	static const int	MAX_INPUT_LEN = 256;
