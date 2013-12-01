@@ -29,6 +29,7 @@ public:
 	bool		GameIsOver();
 	bool		HasPiecesLeft( Checker::CHECKER_TYPE _ct );
 	void		SetPlayerType(Checker::CHECKER_TYPE _type);
+	void		SetUsersTurn( bool _state );
 
 private:
 	// Board information
@@ -48,6 +49,7 @@ private:
 	std::vector<LegalMove>		m_visibleMoves;
 	int							m_selectedCell;
 	Checker::CHECKER_TYPE		m_playerType;
+	bool						m_isPlayersTurn;
 
 	// Functions
 	void						SetupHighlights( int _selectedCell, LegalMove* _rootMove  );

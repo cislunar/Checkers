@@ -5,23 +5,28 @@
 static Simulation* m_sim = NULL;
 void Board::Update(float _dt )
 {
-	// Update highlight 
-	int mouseCellPos = GetCell( m_sim->GetMousePos() );
-	HandleCellSelection( mouseCellPos );
+	if(m_isPlayersTurn)
+	{
+		// Update highlight 
+		int mouseCellPos = GetCell( m_sim->GetMousePos() );
+		HandleCellSelection( mouseCellPos );
+	}
 }
 
 void Board::HandleCellSelection(int _mousePosCell )
 {
-	if( CheckerOnCell(_mousePosCell) )
+	if( CheckerOnCell(_mousePosCell, m_playerType ) )
 	{
 		m_mouseHighlight.SetPos( GetCellPos(  _mousePosCell) );
 		m_mouseHighlight.SetRenderState(true);
 
 		if( m_sim->GetOnMouseButtonDown( SDL_BUTTON_LEFT ) )
 		{
+			// If player is clicking on a cell that hasn't been clicked
+			// we highlight it and check for possible moves and highlight those.
 			if( _mousePosCell != m_selectedCell )
 			{
-				m_selectedCell = _mousePosCell;			
+				m_selectedCell = _mousePosCell;	
 				m_movesRoot.Reset();
 				Checker* c = GetCheckerOnCell( m_selectedCell );
 
@@ -229,12 +234,12 @@ bool Board::CheckerOnCell( int _cell )
 		int cell = -1;
 		for(int i=0; i<12; ++i)
 		{
-			cell = GetCell( m_redCheckers[i].GetPos() );
+			cell = GetCell( m_blackCheckers[i].GetPos() );
 			if( cell != -1 && cell == _cell)
 			{
 				return true;
 			}
-			cell = GetCell( m_blackCheckers[i].GetPos() );
+			cell = GetCell( m_redCheckers[i].GetPos() );
 			if( cell != -1 && cell == _cell)
 			{
 				return true;
@@ -485,4 +490,9 @@ bool Board::HasPiecesLeft( Checker::CHECKER_TYPE _ct )
 void Board::SetPlayerType( Checker::CHECKER_TYPE _type )
 {
 	m_playerType = _type;
+}
+
+void Board::SetUsersTurn( bool _state )
+{
+	m_isPlayersTurn = _state;
 }
