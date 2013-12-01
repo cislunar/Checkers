@@ -1,6 +1,7 @@
 #ifndef __RENDER_H__
 #define __RENDER_H__
 
+#define _WINSOCKAPI_    // stops windows.h including winsock.h
 #include <Windows.h>
 #include "GL\glew.h"
 #include "SDL.h"

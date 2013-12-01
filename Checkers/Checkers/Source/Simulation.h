@@ -1,7 +1,15 @@
+#pragma once
 
+#define WIN32_LEAN_AND_MEAN
+
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
 #include <stdlib.h>	// For random tint
+#include <stdio.h>
 #include "Math.h"
 #include "Render.h"
+
 
 void Log(const char *fmt, ...);
 
@@ -23,7 +31,6 @@ public:
 
 	void SimulateOneFrame(float deltaTime);	// A single logic step
 	void DrawFrame();						// Draw all the sprites
-	void RotationWrap();					// Wrap rotation of sprites
 	glm::mat4 GetViewMat();
 	glm::mat4 GetProjMat();
 	glm::vec2 GetMousePos();
@@ -42,10 +49,11 @@ private:
 	void				SetupGame();
 	void				EatExtraInput(void);
 	void				GetInput( char* _inputBuf, const int _maxMsgLen );
+	void				SetupServer();
+	void				SetupClient();
+	void				CleanupServer();
+	void				CleanupClient();
 
-	static Simulation	singleton;
-	static const int	MAX_SPRITES = 2;
-	GLuint				sprites[MAX_SPRITES];
 	glm::vec2			m_terrainRes;
 	glm::vec2			m_curMouse;
 	glm::vec2			m_prevMouse;
@@ -59,4 +67,19 @@ private:
 	bool				m_gameIsOver;
 	bool				m_canDrawGameOver;
 	USER_TYPE			m_userType;
+	WSADATA				wsaData;
+	int					iResult;
+	SOCKET				ListenSocket;
+	SOCKET				ClientSocket;
+	int					iSendResult;
+	//char				recvbuf[DEFAULT_BUFLEN];
+	//int					recvbuflen = DEFAULT_BUFLEN;
+	//char				sendbuf[DEFAULT_BUFLEN];
+	//int					sendbuflen = DEFAULT_BUFLEN;
+
+	// Statics and consts
+	static const int	MAX_INPUT_LEN = 256;
+	static const int	MAX_SPRITES = 2;
+	static Simulation	singleton;
+
 };
