@@ -24,7 +24,7 @@ class Simulation
 	};
 
 public:
-	static Simulation* GetSimulation() {return &singleton;}
+	static Simulation* GetSimulation() {return &m_singleton;}
 
 
 	void Init();
@@ -46,13 +46,6 @@ public:
 private:
 	Simulation();							// Force use of singleton
 	~Simulation();
-
-	// Statics and consts
-	static const int	DEFAULT_BUFLEN = 1024;
-	static const int	MAX_INPUT_LEN = 256;
-	static const int	MAX_SPRITES = 2;
-	static Simulation	singleton;
-
 	void				ShowGameOver();
 	void				SetupNetworkingState();
 	void				SetupGame();
@@ -63,6 +56,12 @@ private:
 	void				CleanupServer();
 	void				CleanupClient();
 
+	// Statics and consts
+	static const int	DEFAULT_BUFLEN = 1024;
+	static const int	MAX_INPUT_LEN = 256;
+	static const int	MAX_SPRITES = 2;
+	static Simulation	m_singleton;
+	
 	glm::vec2			m_terrainRes;
 	glm::vec2			m_curMouse;
 	glm::vec2			m_prevMouse;
@@ -76,15 +75,15 @@ private:
 	bool				m_gameIsOver;
 	bool				m_canDrawGameOver;
 	USER_TYPE			m_userType;
-	WSADATA				wsaData;
-	int					iResult;
-	SOCKET				ListenSocket;
-	SOCKET				ClientSocket;
-	SOCKET				ConnectSocket;
+	WSADATA				m_wsaData;
+	int					m_iResult;
+	SOCKET				m_listenSocket;
+	SOCKET				m_clientSocket;
+	SOCKET				m_connectSocket;
 
-	int					iSendResult;
-	char				sendbuf[DEFAULT_BUFLEN];
-	int					sendbuflen;
-	char				recvbuf[DEFAULT_BUFLEN];
-	int					recvbuflen;
+	int					m_iSendResult;
+	char				m_sendbuf[DEFAULT_BUFLEN];
+	int					m_sendbuflen;
+	char				m_recvbuf[DEFAULT_BUFLEN];
+	int					m_recvbuflen;
 };
