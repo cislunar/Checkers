@@ -37,3 +37,15 @@ void Checker::Move( glm::vec2 _newPos )
 	m_screenPos = _newPos;
 }
 
+bool operator==( const Checker &a, const Checker &b )
+{
+	return (a.Active() && b.Active())
+		&& (a.GetPos() == b.GetPos())
+		&& (a.GetCheckerType() == b.GetCheckerType());
+}
+
+bool operator!=( const Checker &a, const Checker &b )
+{
+	return !(a == b);
+}
+

@@ -43,6 +43,7 @@ public:
 	bool GetCurMouseButton( int _button );
 	bool GetPrevMouseButton( int _button );
 	bool GetOnMouseButtonDown( int _button );
+	void ReceiveCheckerMovePacket( CheckerMovePacket _cmp );
 
 private:
 	Simulation();							// Force use of singleton
@@ -56,6 +57,7 @@ private:
 	void				SetupClient();
 	void				CleanupServer();
 	void				CleanupClient();
+	void				EndOfTurn();
 
 	// Statics and consts
 	static const int	DEFAULT_BUFLEN = 1024;
@@ -81,6 +83,8 @@ private:
 	SOCKET				m_listenSocket;
 	SOCKET				m_clientSocket;
 	SOCKET				m_connectSocket;
+	CheckerMovePacket	m_outCmp;
+	bool				m_haveLocalCmp;
 
 	int					m_iSendResult;
 	char				m_sendbuf[DEFAULT_BUFLEN];

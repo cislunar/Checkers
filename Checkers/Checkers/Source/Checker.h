@@ -7,6 +7,9 @@
 class Checker : public Render2DObj
 {
 public:
+	friend bool operator== ( const Checker &a, const Checker &b );
+	friend bool operator!= ( const Checker &a, const Checker &b );
+
 	enum CHECKER_TYPE
 	{
 		BLACK_CHECKER,
@@ -19,13 +22,13 @@ public:
 	}
 	void				Cleanup();
 	glm::vec2*			GetPosPointer(){ return &m_screenPos; }
-	CHECKER_TYPE		GetCheckerType(){ return m_type;}
+	CHECKER_TYPE		GetCheckerType()const { return m_type;}
 	void				Init( CHECKER_TYPE _type );
 	void				Move( glm::vec2 _newPos );
 	bool				IsKinged();
 	void				MakeKing( GLuint _kingImg );
 	void				Deactivate( glm::vec2 _newPos );
-	bool				Active(){return m_isActive;}
+	bool				Active()const {return m_isActive;}
 protected:
 	CHECKER_TYPE		m_type;
 	bool				m_isKinged;

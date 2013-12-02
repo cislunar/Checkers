@@ -8,14 +8,14 @@
 // 00000000000000000000000000000000 : Composed 32 bits
 // 0000---------------------------- : checker index 
 // ----0000------------------------ : move count
+// --------00---------------------- : move: left/right(1/0), up/down (1/0)
 // --------000000000000000000000000 : moves
-// --------00---------------------- : move: up/down (1/0), left/right(1/0)
 
 //  MOVEDATA BITPACK EXAMPLE:
 // 01010100101111100000000000000000 : Composed 32 bits
 // 0101---------------------------- : checker index 5
 // ----0100------------------------ : 4 moves
-// --------10111110---------------- : move upRight, upLeft
+// --------10111110---------------- : move downLeft, upLeft, upLeft, downLeft
 // ----------------0000000000000000 : unused move space
 
 // The reason we don't need a Checker type specifier (black or red)

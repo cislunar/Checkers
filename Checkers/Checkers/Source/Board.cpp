@@ -56,9 +56,11 @@ void Board::HandleCellSelection(int _mousePosCell )
 				// Move checker
 				Checker* selected = GetCheckerOnCell( m_selectedCell );
 				LegalMove* finalMove = m_movesRoot.GetMatchingMove( _mousePosCell );
-				UpdateAfterMove( finalMove, selected);
+				HandleFinalMove( finalMove, selected);
 				selected->Move( GetCellPos( _mousePosCell) );
 				ResetHighlights();
+				// Decompose final move into CheckerMovePacket
+				// Then send to Simulation
 				m_movesRoot.Reset();
 			}
 		}
@@ -92,7 +94,87 @@ void Board::RemoveAffectedChecker( int _beginCell, int _endCell)
 	affected->Deactivate( GetCellPos(-1) );
 }
 
-void Board::UpdateAfterMove( LegalMove* finalMove, Checker* _c )
+void Board::DecomposeFinalMove( LegalMove* finalMove, Checker* _c )
+{
+	CheckerMovePacket cmp;
+	unsigned char	idx = -1;
+	unsigned char	moveCnt = 0;
+	uint32_t		moves;
+
+	// Get idx
+	for(int i = 0; i<12; ++i)
+	{
+		switch (m_playerType)
+		{
+		case Checker::BLACK_CHECKER:
+			if(m_blackCheckers[i] == *_c)
+			{
+				idx = i;
+			}
+			break;
+		case Checker::RED_CHECKER:
+			if(m_redCheckers[i] == *_c)
+			{
+				idx = i;
+			}
+			break;
+		default:
+		case Checker::CHECKER_TYPE_CNT:
+			break;
+		}
+	}
+
+	
+}
+
+int	Board::HorizMoveType( int _start, int _end )
+{
+	// move: left/right(1/0)
+	int sMod = _start % 8;
+	int eMod = _end % 8;
+	// Cells numbers are 2D array.
+	// They increase going to the right and down.
+	// Cells on the left have smaller numbers than cells to the right.
+	int retval = eMod < sMod ? 1 : 0;
+	return retval;
+}
+
+int	Board::VertMoveType(  int _start, int _end )
+{
+	// up/down (1/0)
+	// Cells numbers are 2D array.
+	// They increase going to the right and down.
+	// Cells on the above have lower values than cells above
+	int retval = _end < _start ? 1 : 0;
+	return retval;
+}
+
+uint32_t Board::DecomposeFinalMove_GetMoves( LegalMove* _finalMove )
+{
+	LegalMove* move = _finalMove;
+	int moveCnt = 0;
+	// Get moves count
+	while( move->m_prevMove != NULL )
+	{
+		moveCnt++;
+		move = move->m_prevMove;
+	}
+	move = _finalMove;
+	uint32_t retval = 0;
+	for(int i=moveCnt-1; i > 0; --i)
+	{
+		// Each moves consists of 2 bits. Multiply by 2 to get the idx.
+		int idx = i * 2;
+		// Store the up/down dir (1/0)
+		retval = retval | ( ( ) << idx );
+		// Store the leftRight dir (1/0)
+		++idx;
+		retval = retval | ( ( ) << idx );
+	}
+}
+
+
+void Board::HandleFinalMove( LegalMove* finalMove, Checker* _c )
 {
 	if( finalMove->m_moveType == LegalMove::JUMP_MOVE )
 	{
@@ -417,12 +499,20 @@ void Board::GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves
 	{
 		// up left
 		int desiredCell = GetCell( cellPos + glm::vec2(-m_cellSize, -m_cellSize));
-		_possibleMoves[0] = GetMove(_c, _prevMove, glm::vec2(-m_cellSize, -m_cellSize), _cCell, desiredCell);
+		_possibleMoves[0] = GetMove(_c, 
+									_prevMove, 
+									glm::vec2(-m_cellSize, -m_cellSize), 
+									_cCell, 
+									desiredCell);
 		
 		// up right
 		desiredCell = GetCell( cellPos + glm::vec2(m_cellSize, -m_cellSize));
 
-		_possibleMoves[1] = GetMove(_c, _prevMove, glm::vec2(m_cellSize, -m_cellSize), _cCell, desiredCell);
+		_possibleMoves[1] = GetMove(_c, 
+									_prevMove, 
+									glm::vec2(m_cellSize, -m_cellSize), 
+									_cCell, 
+									desiredCell);
 	}
 
 	if( _c->GetCheckerType() == Checker::RED_CHECKER
@@ -430,11 +520,19 @@ void Board::GetPossibleMoves( Checker* _c, int _cCell, LegalMove* _possibleMoves
 	{
 		// down left
 		int desiredCell = GetCell( cellPos + glm::vec2(-m_cellSize, m_cellSize));
-		_possibleMoves[2] = GetMove(_c, _prevMove, glm::vec2(-m_cellSize, m_cellSize), _cCell, desiredCell);
+		_possibleMoves[2] = GetMove(_c, 
+									_prevMove, 
+									glm::vec2(-m_cellSize, m_cellSize), 
+									_cCell, 
+									desiredCell);
 
 		// down right
 		desiredCell = GetCell( cellPos + glm::vec2(m_cellSize, m_cellSize));
-		_possibleMoves[3] = GetMove(_c, _prevMove, glm::vec2(m_cellSize, m_cellSize), _cCell, desiredCell);
+		_possibleMoves[3] = GetMove(_c, 
+									_prevMove, 
+									glm::vec2(m_cellSize, m_cellSize), 
+									_cCell, 
+									desiredCell);
 	}
 }
 

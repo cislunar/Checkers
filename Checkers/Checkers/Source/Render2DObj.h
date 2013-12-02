@@ -14,7 +14,7 @@ public:
 	virtual void		Setup( GLuint _img, glm::vec2 _imageRes, Color _color  );
 	virtual void		Cleanup();
 	virtual void		SetPos(glm::vec2 _pos){ m_screenPos = _pos; }
-	virtual glm::vec2	GetPos(){return m_screenPos;}
+	virtual glm::vec2	GetPos()const{return m_screenPos;}
 	virtual glm::vec2*	GetImageRes(){return &m_imageRes;}
 	virtual void		SetRenderState(bool _state){m_canRender = _state;}
 

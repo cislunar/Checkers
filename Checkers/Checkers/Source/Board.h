@@ -64,8 +64,11 @@ private:
 	void						HandleCellSelection(int _mousePosCell );
 	void						ResetHighlights();
 	bool						CanMoveToCell( int _cellNum );
-	void						UpdateAfterMove( LegalMove* finalMove, Checker* _c );
+	void						HandleFinalMove( LegalMove* finalMove, Checker* _c );
 	void						RemoveAffectedChecker( int _beginCell, int _endCell);
 	bool						IsKingMove( int _cell );
-
+	void						DecomposeFinalMove( LegalMove* finalMove, Checker* _c );
+	uint32_t					DecomposeFinalMove_GetMoves( LegalMove* _finalMove );
+	int							HorizMoveType(  int _start, int _end );
+	int							VertMoveType(  int _start, int _end );
 };
