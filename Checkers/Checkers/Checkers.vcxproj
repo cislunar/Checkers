@@ -82,6 +82,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Board.cpp" />
     <ClCompile Include="Source\Checker.cpp" />
+    <ClCompile Include="Source\CheckerMovePacket.cpp" />
     <ClCompile Include="Source\filereader.cpp" />
     <ClCompile Include="Source\LegalMove.cpp" />
     <ClCompile Include="Source\Main.cpp" />
@@ -95,6 +96,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Board.h" />
     <ClInclude Include="Source\Checker.h" />
+    <ClInclude Include="Source\CheckerMovePacket.h" />
     <ClInclude Include="Source\filereader.h" />
     <ClInclude Include="Source\LegalMove.h" />
     <ClInclude Include="Source\Main.h" />

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "Math.h"
 #include "Render.h"
+#include "CheckerMovePacket.h"
 
 
 void Log(const char *fmt, ...);
