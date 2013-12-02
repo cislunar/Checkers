@@ -68,7 +68,7 @@ private:
 	void						RemoveAffectedChecker( int _beginCell, int _endCell);
 	bool						IsKingMove( int _cell );
 	void						DecomposeFinalMove( LegalMove* finalMove, Checker* _c );
-	uint32_t					DecomposeFinalMove_GetMoves( LegalMove* _finalMove );
+	uint32_t					DecomposeFinalMove_GetMoves( LegalMove* _finalMove, int _moveCnt );
 	int							HorizMoveType(  int _start, int _end );
 	int							VertMoveType(  int _start, int _end );
 };

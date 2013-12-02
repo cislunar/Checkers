@@ -60,7 +60,7 @@ void Board::HandleCellSelection(int _mousePosCell )
 				selected->Move( GetCellPos( _mousePosCell) );
 				ResetHighlights();
 				// Decompose final move into CheckerMovePacket
-				// Then send to Simulation
+				DecomposeFinalMove( finalMove, selected );
 				m_movesRoot.Reset();
 			}
 		}
@@ -124,7 +124,24 @@ void Board::DecomposeFinalMove( LegalMove* finalMove, Checker* _c )
 		}
 	}
 
-	
+	// Get move count
+	LegalMove* ptr = finalMove;
+	while( ptr->m_prevMove != NULL )
+	{
+		moveCnt++;
+		ptr = ptr->m_prevMove;
+	}
+
+	// Get moves
+	moves = DecomposeFinalMove_GetMoves( finalMove, moveCnt );
+
+	// Compose cmp
+	cmp.CheckerIndex( idx );
+	cmp.MoveCount( moveCnt );
+	cmp.Moves( moves );
+
+	// Notify Simulation
+	m_sim->ReceiveCheckerMovePacket(cmp);
 }
 
 int	Board::HorizMoveType( int _start, int _end )
@@ -149,28 +166,25 @@ int	Board::VertMoveType(  int _start, int _end )
 	return retval;
 }
 
-uint32_t Board::DecomposeFinalMove_GetMoves( LegalMove* _finalMove )
+uint32_t Board::DecomposeFinalMove_GetMoves( LegalMove* _finalMove, int _moveCnt )
 {
 	LegalMove* move = _finalMove;
-	int moveCnt = 0;
-	// Get moves count
-	while( move->m_prevMove != NULL )
-	{
-		moveCnt++;
-		move = move->m_prevMove;
-	}
-	move = _finalMove;
 	uint32_t retval = 0;
-	for(int i=moveCnt-1; i > 0; --i)
+	for(int i=_moveCnt-1; i > 0; --i)
 	{
+		// Determine what dirs of the move
+		uint32_t horizMove = HorizMoveType( move->m_prevMove->m_movedToCell, move->m_movedToCell );
+		uint32_t vertMove = VertMoveType( move->m_prevMove->m_movedToCell, move->m_movedToCell );
 		// Each moves consists of 2 bits. Multiply by 2 to get the idx.
 		int idx = i * 2;
 		// Store the up/down dir (1/0)
-		retval = retval | ( ( ) << idx );
+		retval = retval | ( vertMove << idx );
 		// Store the leftRight dir (1/0)
 		++idx;
-		retval = retval | ( ( ) << idx );
+		retval = retval | ( horizMove << idx );
+		move = move->m_prevMove;
 	}
+	return retval;
 }
 
 
