@@ -62,13 +62,15 @@ void Board::HandleCellSelection(int _mousePosCell )
 				// Decompose final move into CheckerMovePacket
 				DecomposeFinalMove( finalMove, selected );
 				m_movesRoot.Reset();
+				m_visibleMoves.clear();
+				m_selectedCell = -1;
 			}
 		}
 		m_mouseHighlight.SetRenderState(false);
 	}
 }
 
-void Board::RemoveAffectedChecker( int _beginCell, int _endCell)
+void Board::RemoveAffectedChecker( int _beginCell, int _endCell )
 {
 	int maxCell = max(_beginCell, _endCell);
 	int minCell = min(_beginCell, _endCell);
@@ -230,7 +232,7 @@ void Board::HandleOtherPlayerMoves( CheckerMovePacket _cmp )
 		int horiz = CheckerMovePacket::GetHorizBit( move );
 		int vert = CheckerMovePacket::GetVertBit( move );
 		int endCellNum = 0;
-		endCellNum = GetCellFromDir( _cmp.Jump(), startCellNum, horiz, endCellNum );
+		endCellNum = GetCellFromDir( _cmp.Jump(), startCellNum, horiz, vert );
 		do 
 		{
 			// If this is a jump move, remove the checker we jumped
@@ -246,7 +248,7 @@ void Board::HandleOtherPlayerMoves( CheckerMovePacket _cmp )
 				move =  _cmp.GetMove( i );
 				horiz = CheckerMovePacket::GetHorizBit( move );
 				vert = CheckerMovePacket::GetVertBit( move );
-				endCellNum = GetCellFromDir( _cmp.Jump(), startCellNum, horiz, endCellNum );
+				endCellNum = GetCellFromDir( _cmp.Jump(), startCellNum, horiz, vert );
 			}
 			else
 			{

@@ -3,11 +3,11 @@
 uint32_t CheckerMovePacket::GetNSetBits( uint16_t _n )
 {
 	// Clamp _n so that it doesn't have a value of more than 32
-	uint16_t n = max(_n, 32);
+	uint16_t n = min(_n, 32);
 	uint32_t retval = 0;
 	for(uint16_t i = 0; i < n; ++i)
 	{
-		retval = retval | (1 << (i-1));
+		retval = retval | (1 << i);
 	}
 	return retval;
 }

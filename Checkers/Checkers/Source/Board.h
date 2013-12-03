@@ -68,7 +68,7 @@ private:
 	void						ResetHighlights();
 	bool						CanMoveToCell( int _cellNum );
 	void						HandleFinalMove( LegalMove* finalMove, Checker* _c );
-	void						RemoveAffectedChecker( int _beginCell, int _endCell);
+	void						RemoveAffectedChecker( int _beginCell, int _endCell );
 	bool						IsKingMove( int _cell );
 	void						DecomposeFinalMove( LegalMove* finalMove, Checker* _c );
 	uint32_t					DecomposeFinalMove_GetMoves( LegalMove* _finalMove, int _moveCnt );
