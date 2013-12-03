@@ -220,6 +220,8 @@ void Board::HandleOtherPlayerMoves( CheckerMovePacket _cmp )
 	unsigned char movesCnt = _cmp.MoveCount();
 	if( movesCnt > 0 )
 	{
+		//####################################################################################
+		// Handle jump and regular moves---------------------------------------------------
 		unsigned char i = 0;
 		// We store the cell the checker starts on because it is not included in the moves data.
 		int startCellNum = 0;
@@ -245,6 +247,21 @@ void Board::HandleOtherPlayerMoves( CheckerMovePacket _cmp )
 				horiz = CheckerMovePacket::GetHorizBit( move );
 				vert = CheckerMovePacket::GetVertBit( move );
 				endCellNum = GetCellFromDir( _cmp.Jump(), startCellNum, horiz, endCellNum );
+			}
+			else
+			{
+				//####################################################################################
+				// Handle KingMaker move-------------------------------------------------------------
+				// King maker move will ALWAYS be the last move a piece makes
+				if( checker->IsKinged() == false
+					&& IsKingMove( endCellNum ) )
+				{
+					checker->MakeKing( m_checkerKing_texHandle );
+				}
+
+				//####################################################################################
+				// Move checker to final spot
+				checker->Move( GetCellPos( endCellNum ) );
 			}
 		} while ( i < movesCnt);
 	}
@@ -286,7 +303,7 @@ void Board::HandleFinalMove( LegalMove* finalMove, Checker* _c )
 	if( _c->IsKinged() == false
 		&& IsKingMove(finalMove->m_movedToCell) )
 	{
-		_c->MakeKing( m_checkerKing );
+		_c->MakeKing( m_checkerKing_texHandle );
 	}
 }
 
@@ -320,7 +337,7 @@ void Board::Cleanup()
 
 	if(m_image != 0)
 	{
-		glDeleteTextures(1, &m_checkerKing);
+		glDeleteTextures(1, &m_checkerKing_texHandle);
 	}
 
 	if(m_image != 0)
@@ -462,7 +479,7 @@ void Board::Setup( char* _imageFilePath, glm::vec2 _imageRes, glm::vec2 _screenR
 
 	m_cellHighlight = LoadImage("cellHighlight.png");
 	m_checkerPlain = LoadImage("checkerPlain.png");
-	m_checkerKing = LoadImage("checkerKing.png");
+	m_checkerKing_texHandle = LoadImage("checkerKing.png");
 
 	m_mouseHighlight.Setup(m_cellHighlight, m_imageRes / 8.f, Color(1.f,.7f, 0,1));
 	m_mouseHighlight.SetPos( GetCellPos( -1 ) );
@@ -687,7 +704,7 @@ void Board::SetPlayerType( Checker::CHECKER_TYPE _type )
 	m_playerType = _type;
 }
 
-void Board::SetUsersTurn( bool _state )
+void Board::SetPlayersTurnState( bool _state )
 {
 	m_isPlayersTurn = _state;
 }

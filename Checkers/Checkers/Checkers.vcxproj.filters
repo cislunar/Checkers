@@ -95,7 +95,7 @@
     <ClInclude Include="Source\CheckerMovePacket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\CheckerPacket.h">
+    <ClInclude Include="Source\CheckerPacketStructs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

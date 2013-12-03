@@ -30,8 +30,9 @@ public:
 	bool		GameIsOver();
 	bool		HasPiecesLeft( Checker::CHECKER_TYPE _ct );
 	void		SetPlayerType(Checker::CHECKER_TYPE _type);
-	void		SetUsersTurn( bool _state );
+	void		SetPlayersTurnState( bool _state );
 	void		HandleOtherPlayerMoves( CheckerMovePacket _cmp );
+	bool		IsPlayersTurn(){return m_isPlayersTurn;}
 
 private:
 	// Board information
@@ -42,7 +43,7 @@ private:
 	Render2DObj					m_mouseHighlight;
 	// Textures
 	GLuint						m_checkerPlain,
-								m_checkerKing,
+								m_checkerKing_texHandle,
 								m_cellHighlight;
 	// Misc
 	float						m_cellSize;

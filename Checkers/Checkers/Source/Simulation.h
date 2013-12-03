@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include "Math.h"
 #include "Render.h"
-#include "CheckerMovePacket.h"
+#include "CheckerPacketStructs.h"
 
 
 void Log(const char *fmt, ...);
@@ -58,6 +58,9 @@ private:
 	void				CleanupServer();
 	void				CleanupClient();
 	void				EndOfTurn();
+	void				BeginTurn();
+	void				SendMovePacket();
+	bool				ReceiveMovePacket( CheckerPacket_Move* _cpm );
 
 	// Statics and consts
 	static const int	DEFAULT_BUFLEN = 1024;
@@ -87,8 +90,7 @@ private:
 	bool				m_haveLocalCmp;
 
 	int					m_iSendResult;
+	int					m_sendRecvBufLen;
 	char				m_sendbuf[DEFAULT_BUFLEN];
-	int					m_sendbuflen;
 	char				m_recvbuf[DEFAULT_BUFLEN];
-	int					m_recvbuflen;
 };
