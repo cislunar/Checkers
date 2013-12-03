@@ -97,6 +97,7 @@
     <ClInclude Include="Source\Board.h" />
     <ClInclude Include="Source\Checker.h" />
     <ClInclude Include="Source\CheckerMovePacket.h" />
+    <ClInclude Include="Source\CheckerPacket.h" />
     <ClInclude Include="Source\filereader.h" />
     <ClInclude Include="Source\LegalMove.h" />
     <ClInclude Include="Source\Main.h" />

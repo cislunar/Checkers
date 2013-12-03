@@ -49,12 +49,12 @@ private:
 	Simulation();							// Force use of singleton
 	~Simulation();
 	void				ShowGameOver();
-	void				SetupNetworkingState();
+	bool				SetupNetworkingState();
 	void				SetupGame();
 	void				EatExtraInput(void);
 	void				GetInput( char* _inputBuf, const int _maxMsgLen );
-	void				SetupServer();
-	void				SetupClient();
+	bool				SetupServer();
+	bool				SetupClient();
 	void				CleanupServer();
 	void				CleanupClient();
 	void				EndOfTurn();

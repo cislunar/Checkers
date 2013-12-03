@@ -6,6 +6,7 @@
 #include <vector>
 #include "LegalMove.h"
 #include <algorithm>
+#include "CheckerMovePacket.h"
 
 struct Rect
 {
@@ -30,6 +31,7 @@ public:
 	bool		HasPiecesLeft( Checker::CHECKER_TYPE _ct );
 	void		SetPlayerType(Checker::CHECKER_TYPE _type);
 	void		SetUsersTurn( bool _state );
+	void		HandleOtherPlayerMoves( CheckerMovePacket _cmp );
 
 private:
 	// Board information
@@ -69,6 +71,7 @@ private:
 	bool						IsKingMove( int _cell );
 	void						DecomposeFinalMove( LegalMove* finalMove, Checker* _c );
 	uint32_t					DecomposeFinalMove_GetMoves( LegalMove* _finalMove, int _moveCnt );
-	int							HorizMoveType(  int _start, int _end );
-	int							VertMoveType(  int _start, int _end );
+	uint8_t						HorizMoveType(  int _start, int _end );
+	uint8_t						VertMoveType(  int _start, int _end );
+	int							GetCellFromDir( bool _jump, int _start, int _horiz, int _vert );
 };

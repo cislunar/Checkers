@@ -135,16 +135,20 @@ void Board::DecomposeFinalMove( LegalMove* finalMove, Checker* _c )
 	// Get moves
 	moves = DecomposeFinalMove_GetMoves( finalMove, moveCnt );
 
+	// Get jumpState
+	bool jumpState = finalMove->ContainsJump();
+
 	// Compose cmp
 	cmp.CheckerIndex( idx );
 	cmp.MoveCount( moveCnt );
 	cmp.Moves( moves );
+	cmp.Jump( jumpState );
 
 	// Notify Simulation
 	m_sim->ReceiveCheckerMovePacket(cmp);
 }
 
-int	Board::HorizMoveType( int _start, int _end )
+uint8_t	Board::HorizMoveType( int _start, int _end )
 {
 	// move: left/right(1/0)
 	int sMod = _start % 8;
@@ -152,31 +156,111 @@ int	Board::HorizMoveType( int _start, int _end )
 	// Cells numbers are 2D array.
 	// They increase going to the right and down.
 	// Cells on the left have smaller numbers than cells to the right.
-	int retval = eMod < sMod ? 1 : 0;
+	uint8_t retval = eMod < sMod ? 1 : 0;
 	return retval;
 }
 
-int	Board::VertMoveType(  int _start, int _end )
+uint8_t	Board::VertMoveType(  int _start, int _end )
 {
 	// up/down (1/0)
 	// Cells numbers are 2D array.
 	// They increase going to the right and down.
 	// Cells on the above have lower values than cells above
-	int retval = _end < _start ? 1 : 0;
+	uint8_t retval = _end < _start ? 1 : 0;
 	return retval;
+}
+
+int Board::GetCellFromDir( bool _jump, int _start, int _horiz, int _vert )
+{
+	// move: up/down (1/0)
+	// move: left/right(1/0)
+
+	int retval = -1;
+	if( _start >= 0
+		&& _start < (8*8) )
+	{
+		//retval = _horiz == 0 : 
+		int offset = 0;
+		if( _horiz == 0 )
+		{
+			offset = 9;
+		}
+		else
+		{
+			offset = 7;
+		}
+
+		if( _vert == 1 )
+		{
+			// flip cell to the row above _start's cell
+			offset -= 16;
+		}
+
+		if( _jump )
+		{
+			// If we have a jump, we multiply by 2 to get the offset at
+			// start's row +/- 2 rows
+			offset *= 2;
+		}
+		retval = _start + offset;
+	}
+	return retval;
+}
+
+void Board::HandleOtherPlayerMoves( CheckerMovePacket _cmp )
+{
+	// Get the vector of the other checker type
+	// So we can handle the moves that were made.
+	std::vector<Checker>	*othercheckers	= NULL;
+	othercheckers = m_playerType == Checker::RED_CHECKER ? &m_blackCheckers : &m_redCheckers;
+
+	Checker* checker = &(*othercheckers)[_cmp.CheckerIndex()];
+	// Get the moves that were made so we can run through them.
+	// Get total count of moves made so we can run through them.
+	unsigned char movesCnt = _cmp.MoveCount();
+	if( movesCnt > 0 )
+	{
+		unsigned char i = 0;
+		// We store the cell the checker starts on because it is not included in the moves data.
+		int startCellNum = 0;
+		startCellNum = GetCell( checker->GetPos() );
+		unsigned char move =  _cmp.GetMove( i );
+		int horiz = CheckerMovePacket::GetHorizBit( move );
+		int vert = CheckerMovePacket::GetVertBit( move );
+		int endCellNum = 0;
+		endCellNum = GetCellFromDir( _cmp.Jump(), startCellNum, horiz, endCellNum );
+		do 
+		{
+			// If this is a jump move, remove the checker we jumped
+			if( _cmp.Jump() )
+			{
+				RemoveAffectedChecker(startCellNum, endCellNum );
+			}
+			++i;
+			// Safety conditional so we don't accidentally access data we don't have
+			if( i < movesCnt)
+			{
+				startCellNum = endCellNum;
+				move =  _cmp.GetMove( i );
+				horiz = CheckerMovePacket::GetHorizBit( move );
+				vert = CheckerMovePacket::GetVertBit( move );
+				endCellNum = GetCellFromDir( _cmp.Jump(), startCellNum, horiz, endCellNum );
+			}
+		} while ( i < movesCnt);
+	}
 }
 
 uint32_t Board::DecomposeFinalMove_GetMoves( LegalMove* _finalMove, int _moveCnt )
 {
 	LegalMove* move = _finalMove;
 	uint32_t retval = 0;
-	for(int i=_moveCnt-1; i > 0; --i)
+	for(int i=_moveCnt-1; i >= 0; --i)
 	{
 		// Determine what dirs of the move
 		uint32_t horizMove = HorizMoveType( move->m_prevMove->m_movedToCell, move->m_movedToCell );
 		uint32_t vertMove = VertMoveType( move->m_prevMove->m_movedToCell, move->m_movedToCell );
 		// Each moves consists of 2 bits. Multiply by 2 to get the idx.
-		int idx = i * 2;
+		int idx = i * BITS_PER_MOVE;
 		// Store the up/down dir (1/0)
 		retval = retval | ( vertMove << idx );
 		// Store the leftRight dir (1/0)
@@ -186,7 +270,6 @@ uint32_t Board::DecomposeFinalMove_GetMoves( LegalMove* _finalMove, int _moveCnt
 	}
 	return retval;
 }
-
 
 void Board::HandleFinalMove( LegalMove* finalMove, Checker* _c )
 {
@@ -203,7 +286,7 @@ void Board::HandleFinalMove( LegalMove* finalMove, Checker* _c )
 	if( _c->IsKinged() == false
 		&& IsKingMove(finalMove->m_movedToCell) )
 	{
-		_c->MakeKing( m_checkerKing);
+		_c->MakeKing( m_checkerKing );
 	}
 }
 
