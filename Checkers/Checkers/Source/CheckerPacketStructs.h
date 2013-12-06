@@ -3,6 +3,9 @@
 #include "CheckerMovePacket.h"
 #include <stdint.h>
 
+#define DEFAULT_BUFLEN	(1024)
+#define MAX_INPUT_LEN	(256)
+
 enum CHECKER_PACKET_TYPE
 {
 	CHECKER_PACKET_MOVE,

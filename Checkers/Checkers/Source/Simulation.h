@@ -61,18 +61,19 @@ private:
 	void				BeginTurn();
 	void				SendMovePacket();
 	bool				ReceiveMovePacket( CheckerPacket_Move* _cpm );
+	void				HandleMovePacket( CheckerPacket_Move* _cpm );
 
 	// Statics and consts
-	static const int	DEFAULT_BUFLEN = 1024;
-	static const int	MAX_INPUT_LEN = 256;
+	
 	static const int	MAX_SPRITES = 2;
+	static const int	SDL_KEY_CNT = 322;
 	static Simulation	m_singleton;
 	
 	glm::vec2			m_terrainRes;
 	glm::vec2			m_curMouse;
 	glm::vec2			m_prevMouse;
-	bool				m_KEYS[322]; // Number of SDLK_DOWN events
-	bool				m_prevKEYS[322]; // Number of SDLK_DOWN events
+	bool				m_KEYS[SDL_KEY_CNT]; // Number of SDLK_DOWN events
+	bool				m_prevKEYS[SDL_KEY_CNT]; // Number of SDLK_DOWN events
 	unsigned char		m_prevMouseButts;
 	unsigned char		m_curMouseButts;
 	GLuint				m_redWins;
