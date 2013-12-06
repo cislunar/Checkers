@@ -65,6 +65,7 @@ private:
 	void				HandleChatPacket( CheckerPacket_Chat* _cpc );
 	void				HandleCheckerPacket( char* _data );
 	void				SetupReceivePacketThread();
+	void				SetupChatThread();
 	void				SignalAnnouncement();
 	int					ReceiveCheckerPackets( );
 	int					GetChatData();
@@ -107,7 +108,8 @@ private:
 	bool				m_haveLocalCmp;
 	bool				m_receivePackets;
 	bool				m_readChatData;
-	SDL_Thread			*thread;
+	SDL_Thread			*m_receiveThread;
+	SDL_Thread			*m_chatThread;
 	bool				m_otherPlayerQuit;
 
 	int					m_iSendResult,
