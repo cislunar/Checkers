@@ -45,6 +45,7 @@ public:
 	bool GetOnMouseButtonDown( int _button );
 	void ReceiveCheckerMovePacket( CheckerMovePacket _cmp );
 
+
 private:
 	Simulation();							// Force use of singleton
 	~Simulation();
@@ -58,10 +59,24 @@ private:
 	void				CleanupServer();
 	void				CleanupClient();
 	void				EndOfTurn();
-	void				BeginTurn();
 	void				SendMovePacket();
-	bool				ReceiveMovePacket( CheckerPacket_Move* _cpm );
 	void				HandleMovePacket( CheckerPacket_Move* _cpm );
+	void				HandleChatPacket( CheckerPacket_Chat* _cpc );
+	void				HandleCheckerPacket( char* _data );
+	void				SetupReceivePacketThread();
+	void				SignalAnnouncement();
+	int					ReceiveCheckerPackets( );
+	int					GetChatData();
+
+	static int			ReadChat_ThreadProxy( void* pParam )
+	{
+		return ((Simulation*)pParam)->GetChatData();
+	}
+
+	static int			ReceivePackets_ThreadProxy( void* pParam )
+	{
+		return ((Simulation*)pParam)->ReceiveCheckerPackets();
+	}
 
 	// Statics and consts
 	
@@ -89,6 +104,10 @@ private:
 	SOCKET				m_connectSocket;
 	CheckerMovePacket	m_outCmp;
 	bool				m_haveLocalCmp;
+	bool				m_receivePackets;
+	bool				m_readChatData;
+	SDL_Thread			*thread;
+	bool				m_otherPlayerQuit;
 
 	int					m_iSendResult;
 	int					m_sendRecvBufLen;
