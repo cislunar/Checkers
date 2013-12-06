@@ -59,6 +59,7 @@ private:
 	void				CleanupServer();
 	void				CleanupClient();
 	void				EndOfTurn();
+	void				SendChatPacket( char* _msg );
 	void				SendMovePacket();
 	void				HandleMovePacket( CheckerPacket_Move* _cpm );
 	void				HandleChatPacket( CheckerPacket_Chat* _cpc );
@@ -109,8 +110,11 @@ private:
 	SDL_Thread			*thread;
 	bool				m_otherPlayerQuit;
 
-	int					m_iSendResult;
-	int					m_sendRecvBufLen;
+	int					m_iSendResult,
+						m_iSendChatResult;
+	int					m_sendRecvBufLen,
+						m_sendChatRecvBufLen;
 	char				m_sendbuf[DEFAULT_BUFLEN];
+	char				m_sendChatBuf[DEFAULT_BUFLEN];
 	char				m_recvbuf[DEFAULT_BUFLEN];
 };
